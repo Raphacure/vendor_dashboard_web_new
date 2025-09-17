@@ -1,0 +1,10 @@
+
+
+export const roleList = [
+    { label: "Doctor", value: "doctor" },
+    { label: "Nurse", value: "nurse" },
+    { label: "Receptionist", value: "receptionist" },
+    { label: "Pharmacist", value: "pharmacist" },
+    { label: "Lab Technician", value: "lab_technician" },
+    { label: "Administrator", value: "administrator" },
+  ];

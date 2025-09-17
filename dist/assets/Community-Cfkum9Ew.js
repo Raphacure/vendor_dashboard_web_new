@@ -1,0 +1,7 @@
+import{d as u,r as i,a as x,u as p,c as f,h as g,df as h,j as e}from"./index-ChUmNm8R.js";import{CommunityCard as j}from"./AllCommunities-Drovve2Q.js";const C=u.div`
+    padding: 20px;
+
+    @media (max-width: 675px) {
+        padding: 5px;
+    }
+`,v=()=>{const[c,d]=i.useState([]),[o,r]=i.useState(!0),a=x(),n=p(),{allCommunities:s}=f(t=>t.community),{linkableId:l}=g();return i.useEffect(()=>{n(h({client_id:l}))},[n]),i.useEffect(()=>{if(s!=null&&s.communities){const t=s==null?void 0:s.communities.filter(m=>m.status==="active");d(t),r(!1)}},[s]),e.jsx(C,{children:e.jsxs("div",{className:"border shadow rounded-[29px] w-full",children:[e.jsxs("div",{className:"flex flex-row justify-between items-center p-2 bg-[#DFECFD] rounded-t-[25px] m-1",children:[e.jsx("h2",{className:"text-lg",children:"Communities"}),e.jsx("button",{className:"text-base bg-[#252B61] text-white px-3 py-1 !rounded-[25px] cursor-pointer",onClick:()=>a("/communities/create"),children:"Create New"})]}),e.jsxs("div",{className:"w-full flex flex-row items-center justify-between !p-4",children:[e.jsx("h2",{className:"!text-lg",children:"Our Communities"}),e.jsx("span",{className:"text-base cursor-pointer",onClick:()=>a("/communities"),children:"View All"})]}),e.jsx("div",{className:"m-3 grid lg:grid-cols-3 gap-4 md:grid-cols-2 grid-cols-1 pb-4",children:o?e.jsx("div",{children:"Loading..."}):c.slice(0,3).map(t=>e.jsx(j,{data:t},t.id))})]})})};export{v as C};
