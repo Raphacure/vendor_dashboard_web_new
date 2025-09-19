@@ -2,16 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { BookingStyled } from "./Booking.styled";
 import { RiDownloadLine } from "react-icons/ri";
 import DownloadForm from "@/components/custom/DownloadForm/DownloadForm";
-import {
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from "react-router";
-import { useDispatch } from "react-redux";
-import { getBookingWithFiltersAPI } from "@/redux/slices/dashboard/dashboardService";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import moment from "moment";
-import BookingModals from "./bookingModals/BookingModals";
-import { toast } from "react-hot-toast";
 import SecoundaryButton from "@/components/custom/button/SecoundaryButton";
 import { LoadingOutlined } from "@ant-design/icons";
 import { DatePicker, Select, Spin } from "antd";
@@ -24,20 +16,19 @@ import {
 import MobileFilter from "@/components/custom/filter/MobileFilter";
 import BookingAction from "./bookingComponents/BookingAction";
 import BookingStatus from "./bookingComponents/BookingStatus";
-import useClientLinkableId from "@/hooks/auth/useClientLinkableId";
-import CreateOrder from "./CreateOrderForm/CreateOrder";
 import CommonSearchBox from "@/components/custom/search/CommonSearchBox";
 import CustomTable from "@/components/custom/Table/CustomTable/CustomTable";
 import ClearFilterButton from "@/components/custom/button/ClearFilterButton";
+import useVendorLinkableId from "@/hooks/auth/useVendorLinkableId";
+import { useGetBookings } from "@/hooks/useQuerys/bookings/bookingsQuery";
+import { useDebounce } from "@uidotdev/usehooks";
 
 const Booking = () => {
-  const navigate = useNavigate() as any;
-  const { linkableId } = useClientLinkableId();
+  const navigate = useNavigate();
+  const { linkableId } = useVendorLinkableId();
   const [searchParams, setSearchParams] = useSearchParams();
   const searchTerm = searchParams.get("globalsearch");
   const bookingTab = searchParams.get("tab");
-  const dispatch = useDispatch() as any;
-  const [bookingList, setBookingList] = useState(null) as any;
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const { section } = useParams();
@@ -106,17 +97,14 @@ const Booking = () => {
     ];
 
     // Determine initial selection based on URL params
-    let initialSelection;
+    let initialSelection = filterOptions[0]; // Default to "All Bookings"
     if (section) {
       initialSelection =
-        filterOptions.find((item: any) => item.type === section) ||
-        filterOptions[0];
+        filterOptions.find((item) => item.type === section) || filterOptions[0];
     } else if (bookingTab) {
       initialSelection =
-        filterOptions.find((item: any) => item.type === bookingTab) ||
+        filterOptions.find((item) => item.type === bookingTab) ||
         filterOptions[0];
-    } else {
-      initialSelection = filterOptions[0]; // Default to "All Bookings"
     }
 
     return {
@@ -124,14 +112,11 @@ const Booking = () => {
       // For desktop: single selected filter
       selectedFilter: initialSelection,
       // For mobile: array of selected filter keys
-      selectedFilters: [initialSelection.key],
+      selectedFilters: [initialSelection.type], // FIX: Use .type for consistency
     };
   });
 
-  const [loading, setLoading] = useState(true);
-  const [time, setTime] = useState(new Date());
-
-  useEffect(() => {}, [filterState]);
+  const [time] = useState(new Date());
 
   // Helper function to get current filter key based on device
   const getCurrentFilterKey = () => {
@@ -139,173 +124,125 @@ const Booking = () => {
       return [
         ...new Set(
           filterState.options
-            .filter((item: any) =>
-              filterState.selectedFilters.includes(item.type)
-            )
-            .map((item: any) => item.key)
+            .filter((item) => filterState.selectedFilters.includes(item.type))
+            .map((item) => item.key)
         ),
       ].join(",");
-    } else {
-      return filterState.selectedFilter.key;
     }
+    return filterState.selectedFilter.key;
   };
 
   // Helper function to get current filter label
   const getCurrentFilterLabel = () => {
     if (checkIsMobile()) {
-      if (filterState.selectedFilters.includes("")) {
+      if (filterState.selectedFilters.includes("all")) {
         return "All Bookings";
       }
       // Return the first selected filter's label for mobile
-      const firstSelectedKey = filterState.selectedFilters[0];
+      const firstSelectedType = filterState.selectedFilters[0];
       const selectedOption = filterState.options.find(
-        (opt) => opt.key === firstSelectedKey
+        (opt) => opt.type === firstSelectedType
       );
       return selectedOption?.label || "All Bookings";
-    } else {
-      return filterState.selectedFilter.label;
     }
+    return filterState.selectedFilter.label;
   };
 
-  useMemo(() => {
-    if (searchTerm && searchTerm?.length > 0) {
+  useEffect(() => {
+    if (searchTerm) {
       const allBookingsOption = filterState.options.find(
-        (opt) => opt.key === ""
+        (opt) => opt.type === "all"
       );
       if (allBookingsOption) {
         setFilterState((prev) => ({
           ...prev,
           selectedFilter: allBookingsOption,
-          selectedFilters: [""],
+          selectedFilters: ["all"],
         }));
       }
     }
-  }, [searchTerm]);
+  }, [searchTerm, filterState.options]);
 
   useEffect(() => {
-    setFilters((pre) => {
-      return {
-        ...pre,
-        searchText: searchTerm || "",
-      };
-    });
+    setFilters((pre) => ({
+      ...pre,
+      searchText: searchTerm || "",
+    }));
   }, [searchTerm]);
 
-  const getAllBookings = async () => {
-    if (!linkableId) {
-      return;
-    }
-    try {
-      setLoading(true);
-      const currentFilterKey = getCurrentFilterKey();
-      const currentFilterLabel = getCurrentFilterLabel();
+  const currentFilterKey = getCurrentFilterKey();
+  const currentFilterLabel = getCurrentFilterLabel();
 
-      const result = (await dispatch(
-        getBookingWithFiltersAPI({
-          limited_fields: true,
-          filters: {
-            from: "hr",
-            ...(searchParams.get("clientOrderId")
-              ? { clientOrderId: searchParams.get("clientOrderId") }
-              : {}),
-            page: page,
-            count: pageSize,
-            status: checkIsMobile()
-              ? currentFilterKey
-              : filters.status.join(","),
-            type: null,
-            id: String(linkableId),
-            searchText:
-              searchTerm && currentFilterLabel === "All Bookings"
-                ? searchTerm
-                : filters.searchText,
-            ...(filters.dateRange
-              ? {
-                  dateRange: {
-                    dateType: "scheduled",
-                    from: filters.dateRange.start_date,
-                    to: filters.dateRange.end_date,
-                  },
-                }
-              : {}),
-          },
-        })
-      )) as any;
-
-      if (result?.error) {
-        toast.error(result?.error?.message || "Unknown Error Occured");
-        return;
-      }
-
-      setBookingList(result?.payload?.data);
-    } catch (error) {
-      toast.error("unknown error occured");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const debounce = setTimeout(() => {
-      if (linkableId) {
-        getAllBookings();
-      }
-    }, 300);
-    return () => clearTimeout(debounce);
+  const memorizedFilters = useMemo(() => {
+    return {
+      from: "vendor",
+      page,
+      pageSize,
+      status: checkIsMobile() ? currentFilterKey : filters.status.join(","),
+      id: String(linkableId),
+      searchText:
+        searchTerm && currentFilterLabel === "All Bookings"
+          ? searchTerm
+          : filters.searchText,
+      ...(filters.dateRange
+        ? {
+            dateRange: {
+              dateType: "scheduled",
+              from: filters.dateRange.start_date,
+              to: filters.dateRange.end_date,
+            },
+          }
+        : {}),
+    };
   }, [
     page,
-    dispatch,
-    filterState.selectedFilter.label,
-    filterState.selectedFilters,
     pageSize,
-    searchTerm,
-    linkableId,
+    currentFilterKey,
     filters,
+    linkableId,
+    searchTerm,
+    currentFilterLabel,
   ]);
+
+  const bookingFilters = useDebounce(memorizedFilters, 600);
+
+  // OPTIMIZATION: Use isPending from react-query and alias it to 'loading' for the JSX
+  const { data, isPending: loading } = useGetBookings(bookingFilters);
 
   const [isFilterOpen, setIsFIlterOpen] = useState(false);
 
-  console.log("filterState", filterState);
-
-  // Combined handler for mobile filters
-  const handleMobileFilter = (type: any, filters: any) => {
-    if (Number(searchTerm?.length) > 0) {
+  // OPTIMIZATION: Refactored for clarity and removed unused 'filters' parameter
+  const handleMobileFilter = (type: string) => {
+    if (searchTerm) {
       navigate("/bookings", { replace: true });
     }
 
     setFilterState((prev) => {
+      const { selectedFilters, options } = prev;
       let newSelectedFilters;
 
       if (type === "all") {
-        // If "All Bookings" is selected, remove all other filters and only keep "All Bookings"
         newSelectedFilters = ["all"];
       } else {
-        // If any other filter is selected
-        if (prev.selectedFilters.includes(type)) {
-          // Deselect the filter if already selected
-          newSelectedFilters = prev.selectedFilters.filter(
-            (filterType: any) => filterType !== type
-          );
+        const wasAllSelected = selectedFilters.includes("all");
+        const isCurrentlySelected = selectedFilters.includes(type);
 
-          // If no filters are left after deselecting, default to "All Bookings"
-          if (newSelectedFilters.length === 0) {
-            newSelectedFilters = ["all"];
-          }
+        if (wasAllSelected) {
+          newSelectedFilters = [type];
+        } else if (isCurrentlySelected) {
+          newSelectedFilters = selectedFilters.filter((t) => t !== type);
         } else {
-          // Select the new filter
-          // Remove "All Bookings" if it exists, then add the new filter
-          newSelectedFilters = prev.selectedFilters.filter(
-            (filterType: any) => filterType !== "all"
-          );
-          newSelectedFilters = [...newSelectedFilters, type];
+          newSelectedFilters = [...selectedFilters, type];
         }
       }
 
-      // Update desktop selection to match the first mobile selection
+      if (newSelectedFilters.length === 0) {
+        newSelectedFilters = ["all"];
+      }
+
       const firstSelectedType = newSelectedFilters[0] || "all";
       const correspondingDesktopFilter =
-        prev.options.find((opt) => opt.type === firstSelectedType) ||
-        prev.options[0];
+        options.find((opt) => opt.type === firstSelectedType) || options[0];
 
       return {
         ...prev,
@@ -317,7 +254,7 @@ const Booking = () => {
 
   //modal logic
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalData, setModalData] = useState(null);
+  const [modalData, setModalData] = useState<any>(null);
   const [selectedModalAction, setSelectedModalAction] = useState("");
 
   const instituteAction = useCallback((action: string, data: any = {}) => {
@@ -334,28 +271,6 @@ const Booking = () => {
     }
   }, []);
 
-  const handleModalSoftCLose = () => {
-    setIsModalOpen(false);
-    setModalData(null);
-    setSelectedModalAction("");
-  };
-
-  const handleModalOpen = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-    setModalData(null);
-    setSelectedModalAction("");
-    if (linkableId) {
-      getAllBookings();
-    }
-  };
-
-  const [showCreateAppointmentForm, setShowCreateAppointmentForm] =
-    useState(false);
-  const [showCreateOrderForm, setShowCreateOrderForm] = useState(false);
   const [showDownloadPopup, setShowDownloadPopup] = useState(false);
 
   const handleRowClick = (id: string) => {
@@ -435,18 +350,7 @@ const Booking = () => {
               Filters
             </button>
           </div>
-          <div className="booking-create">
-            {/* <button
-              className="add-patient"
-              onClick={() =>
-                navigate("/bookings/addPatient", {
-                  state: { name: "Add Patient", noRender: { footer: true } },
-                })
-              }
-            >
-              + Employee
-            </button> */}
-          </div>
+          <div className="booking-create"></div>
         </div>
         {isFilterOpen && (
           <MobileFilter
@@ -459,82 +363,80 @@ const Booking = () => {
           />
         )}
         <div className="booking-mobile-body-div">
-          {bookingList?.bookings?.length > 0
-            ? bookingList?.bookings?.map?.((row: any, index: any) => {
+          {(data?.data?.bookings?.length ?? 0) > 0
+            ? data?.data?.bookings?.map?.((row: any) => {
                 const date = moment(
                   row?.collection_1_date ?? row?.collection_2_date,
                   "DD/MM/YYYY"
                 );
                 return (
-                  <>
-                    <div className="booking-mobile-div-card">
-                      <div className="flex justify-between gap-[2px]">
-                        <div className="booking-mobile-card-details">
-                          <div className="calender-box-mobile">
-                            <span className="date-number-span">
-                              {date?.isValid() ? date.date() : "N/A"}
-                            </span>
-                            <span className="date-month-name">
-                              {date?.isValid()
-                                ? date.format("MMM").toUpperCase()
-                                : "N/A"}
-                            </span>
-                            <span className="booking-type">
-                              {date?.isValid()
-                                ? date.format("YYYY").toUpperCase()
-                                : "N/A"}
-                            </span>
-                          </div>
-                          <div className="booking-details-mobile">
-                            <p
-                              title={`${row?.user?.first_name ?? ""} ${
-                                row?.user?.last_name ?? ""
-                              }`}
-                              onClick={() =>
-                                instituteAction("booking_details", row)
-                              }
-                              className="booking-details-name cursor-pointer"
-                            >{`${row?.user?.first_name ?? ""} ${
-                              row?.user?.last_name ?? ""
-                            }`}</p>
-                            <p
-                              title={
-                                row?.collection_1_slot ??
-                                row?.collection_2_slot ??
-                                "N/A"
-                              }
-                              className="booking-details-slot"
-                            >
-                              {row?.collection_1_slot ??
-                                row?.collection_2_slot ??
-                                "N/A"}
-                            </p>
-                            <p
-                              title={formatStatus(row?.type ?? "N/A")}
-                              className="booking-details-type"
-                            >
-                              {formatStatus(row?.type ?? "N/A")}
-                            </p>
-                          </div>
+                  <div className="booking-mobile-div-card" key={row.id}>
+                    <div className="flex justify-between gap-[2px]">
+                      <div className="booking-mobile-card-details">
+                        <div className="calender-box-mobile">
+                          <span className="date-number-span">
+                            {date?.isValid() ? date.date() : "N/A"}
+                          </span>
+                          <span className="date-month-name">
+                            {date?.isValid()
+                              ? date.format("MMM").toUpperCase()
+                              : "N/A"}
+                          </span>
+                          <span className="booking-type">
+                            {date?.isValid()
+                              ? date.format("YYYY").toUpperCase()
+                              : "N/A"}
+                          </span>
                         </div>
-                        <div className="status-mobile-div">
-                          <BookingStatus
-                            data={row}
-                            time={time}
-                            instituteAction={instituteAction}
-                          />
+                        <div className="booking-details-mobile">
+                          <p
+                            title={`${row?.user?.first_name ?? ""} ${
+                              row?.user?.last_name ?? ""
+                            }`}
+                            onClick={() =>
+                              instituteAction("booking_details", row)
+                            }
+                            className="booking-details-name cursor-pointer"
+                          >{`${row?.user?.first_name ?? ""} ${
+                            row?.user?.last_name ?? ""
+                          }`}</p>
+                          <p
+                            title={
+                              row?.collection_1_slot ??
+                              row?.collection_2_slot ??
+                              "N/A"
+                            }
+                            className="booking-details-slot"
+                          >
+                            {row?.collection_1_slot ??
+                              row?.collection_2_slot ??
+                              "N/A"}
+                          </p>
+                          <p
+                            title={formatStatus(row?.type ?? "N/A")}
+                            className="booking-details-type"
+                          >
+                            {formatStatus(row?.type ?? "N/A")}
+                          </p>
                         </div>
                       </div>
-                      <div>
-                        <hr className="my-1" />
-                        <BookingAction
-                          instituteAction={instituteAction}
-                          time={time}
+                      <div className="status-mobile-div">
+                        <BookingStatus
                           data={row}
+                          time={time}
+                          instituteAction={instituteAction}
                         />
                       </div>
                     </div>
-                  </>
+                    <div>
+                      <hr className="my-1" />
+                      <BookingAction
+                        instituteAction={instituteAction}
+                        time={time}
+                        data={row}
+                      />
+                    </div>
+                  </div>
                 );
               })
             : !loading && (
@@ -543,37 +445,20 @@ const Booking = () => {
                 </p>
               )}
         </div>
-        {showCreateOrderForm && (
-          <CreateOrder
-            visible={showCreateOrderForm}
-            reload={getAllBookings}
-            onCancel={() => setShowCreateOrderForm(false)}
-          />
-        )}
         <div className="load-more-btn-div">
           {loading ? (
-            <>
-              <Spin
-                indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />}
-              />
-            </>
+            <Spin
+              indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />}
+            />
           ) : (
             <SecoundaryButton
-              disabled={bookingList?.totalCount < pageSize || loading}
+              disabled={(data?.data?.totalCount ?? 0) < pageSize || loading}
               onClick={() => setPageSize((pre) => pre + 10)}
             >
               Load More
             </SecoundaryButton>
           )}
         </div>
-        <BookingModals
-          modalData={modalData}
-          selectedAction={selectedModalAction}
-          open={isModalOpen}
-          handleClose={handleModalClose}
-          handleOpen={handleModalOpen}
-          handleSoftClose={handleModalSoftCLose}
-        />
       </BookingStyled>
     );
   }
@@ -676,29 +561,6 @@ const Booking = () => {
             )}
           </div>
           <div className="pd-container">
-            {/* <button
-              className="add-patient"
-              onClick={() => setShowCreateOrderForm(true)}
-            >
-              Create Order
-            </button> */}
-
-            {/* {showCreateOrderForm && (
-              <CreateOrderForm
-                visible={showCreateOrderForm}
-                reload={getAllBookings}
-                onCancel={() => setShowCreateOrderForm(false)}
-                refreshBookingList={getAllBookings}
-              />
-            )} */}
-            {showCreateOrderForm && (
-              <CreateOrder
-                visible={showCreateOrderForm}
-                reload={getAllBookings}
-                onCancel={() => setShowCreateOrderForm(false)}
-              />
-            )}
-
             <button
               className="download-btn"
               onClick={() => setShowDownloadPopup(true)}
@@ -787,14 +649,7 @@ const Booking = () => {
                 key: "Status",
                 dataIndex: "type",
                 render: (_, row) => {
-                  return (
-                    // <BookingStatus
-                    //   data={row}
-                    //   time={time}
-                    //   instituteAction={instituteAction}
-                    // />
-                    formatStatus(row?.status) ?? "N/A"
-                  );
+                  return formatStatus(row?.status) ?? "N/A";
                 },
               },
               {
@@ -812,7 +667,7 @@ const Booking = () => {
                 },
               },
             ]}
-            data={bookingList?.bookings || []}
+            data={data?.data?.bookings || []}
             showingName={
               searchParams.get("clientOrderId")
                 ? `bookings for order:${searchParams.get("clientOrderId")}`
@@ -826,21 +681,10 @@ const Booking = () => {
               setPage(page);
               setPageSize(pageSize);
             }}
-            total={bookingList?.totalCount}
+            total={data?.data?.totalCount ?? 0}
           />
         </div>
       </div>
-
-      {/* modal */}
-      <BookingModals
-        modalData={modalData}
-        selectedAction={selectedModalAction}
-        open={isModalOpen}
-        handleClose={handleModalClose}
-        handleOpen={handleModalOpen}
-        handleSoftClose={handleModalSoftCLose}
-      />
-      {/* // */}
     </BookingStyled>
   );
 };

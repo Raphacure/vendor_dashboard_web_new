@@ -3,17 +3,9 @@
 @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
 
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
   font-family: "Poppins", sans-serif;
 }
 
-.bodySection {
-  margin: auto;
-  color: #333;
-  /* background: #f5f5f5; */
-}
 body {
   /* font-family: inherit; */
   font-size: 16px;
@@ -22,92 +14,14 @@ body {
 iframe#webpack-dev-server-client-overlay {
   display: none;
 }
-.adminControlApp {
-  min-height: 1000px;
-  /* display: inline-block; */
-  background: #f5f5f5;
-}
-.layout-container {
-  /* padding-top: 70px; */
-  width: 100%;
-  margin: auto;
-  padding-bottom: 0px;
-  background-color: #f6f9fd;
-  min-height: 100vh;
-}
 .raphaplus-layout-container {
   display: flex;
   padding-top: 88px;
   width: 100%;
   min-height: 100vh;
 }
-.header-page-sec-top-full {
-  border-bottom: 1px solid #e2e2e2;
-}
-.full-content-sec-page-design {
-  width: 100%;
-  display: flex;
-  /* margin-top: 70px; */
-  gap: 20px;
-}
-.doctor-dashboard-body-content {
-  padding-top: 100px;
-}
-.left-menu-side-content {
-  width: 20%;
-  background: #fff;
-  box-shadow: 2px 2px 19px 0px rgba(0, 0, 0, 0.05);
-  background: #fff;
-  border-right: 2px solid #e2e2e2;
-  width: 300px;
-  display: flex;
-  justify-content: left;
-}
-.right-menu-side-content {
-  width: 80%;
-}
 .cursor-pointer {
   cursor: pointer;
-}
-@media (max-width: 300px) {
-  .layout-container {
-    margin-top: 5rem;
-  }
-}
-@media (max-width: 768px) {
-  .full-content-sec-page-design {
-    display: block;
-    padding-left: 10px;
-    padding-right: 10px;
-  }
-  .left-menu-side-content {
-    width: 100%;
-  }
-  .right-menu-side-content {
-    width: 100%;
-  }
-}
-
-.modal-dialog {
-  max-width: 100% !important;
-  height: 100%;
-  display: flex;
-}
-.modal-content {
-  width: max-content !important;
-  margin: auto;
-  min-width: 50%;
-}
-.bookings-modal .modal-content {
-  max-width: 60%;
-}
-.save-btn {
-  border-radius: 7px;
-}
-.cancelbtn {
-  border-radius: 7px;
-  padding: 10px;
-  border: 1px solid black;
 }
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
@@ -137,18 +51,6 @@ input[type="number"]::-webkit-inner-spin-button {
 
 .w-full {
   width: 100%;
-}
-
-img,
-svg,
-video,
-canvas,
-audio,
-iframe,
-embed,
-object {
-  display: initial !important;
-  vertical-align: middle;
 }
 
 .ant-tabs-ink-bar {

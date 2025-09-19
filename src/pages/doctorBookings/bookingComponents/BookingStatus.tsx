@@ -1,10 +1,8 @@
 import { checkIsMobile, formatStatus } from "@/lib/common";
-import { doctorInstantCallAPI } from "@/redux/slices/doctor/doctorService";
 import { Menu,Dropdown } from "antd";
 import moment from "moment";
 import { FaRegCheckCircle } from "react-icons/fa";
 import { FaPhone } from "react-icons/fa6";
-import { FiChevronDown } from "react-icons/fi";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 
@@ -34,17 +32,7 @@ const BookingStatus = ({ data, instituteAction, time }: any) => {
   
         const handleMenuClick = async (e: any) => {
           if (e.key === "call") {
-            const result = await dispatch(
-              doctorInstantCallAPI({
-                patient_name: `${data?.user?.first_name} ${data?.user?.last_name}`,
-                doctor_name: data?.doctor?.name,
-                patient_number: data?.user?.phone ?? data?.user?.parent?.phone,
-                doctor_number: JSON.parse(
-                  localStorage.getItem("user") || JSON.stringify({})
-                )?.phone,
-                booking_id: data?.id,
-              })
-            );
+            console.log("hai")
           } else if (e.key === "video") {
             navigate(`/VideoCall?roomID=${data?.id}`);
           } else if (e.key === "chat") {

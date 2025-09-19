@@ -2,20 +2,17 @@ import { useEffect, useMemo, useState } from "react";
 import { IoArrowBack, IoSearchOutline, IoClose } from "react-icons/io5";
 import { useNavigate, useLocation } from "react-router";
 import RaphaPlusCommonSearch from "../../components/CommonSearch/CommonSearch";
-import { getBookingWithFiltersAPI } from "@/redux/slices/dashboard/dashboardService";
 import BubbleLoader from "../../components/loader/bubbleLoader/BubbleLoader";
-import useClientDetails from "@/hooks/auth/useClientDetails";
 import { getCurrentRoute, getName } from "@/lib/common";
 import { locationsDetails } from "../Layout.constants";
 import { DashBoardHeaderStyled, HeaderStyled } from "./MobileHeader.styled";
-import { getAllClientEmpoyess } from "@/redux/slices/employees/EmployeeService";
 
 const MobileHeader = () => {
   const navigate = useNavigate();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const location = useLocation();
   const searchTerm = new URLSearchParams(location.search).get("clinic_search");
-  const { clientDetails, loading, linkableId } = useClientDetails();
+  const { clientDetails, loading, linkableId } = {};
   const currentPathKey =
     getCurrentRoute(
       locationsDetails.map((item) => ({ path: item.path, key: item.name })),
@@ -122,64 +119,64 @@ const MobileHeader = () => {
                   break;
               }
             }}
-            searchAPI={[
-              {
-                api: (searchText: string) => {
-                  return getBookingWithFiltersAPI({
-                    filters: {
-                      searchText: searchText,
-                      from: "hr",
-                      page: 1,
-                      count: 6,
-                      status: "",
-                      type: null,
-                      id: linkableId,
-                    },
-                  });
-                },
-                key: "bookings",
-                onSearchData: (payload: any) => {
-                  const searchResult = payload?.data?.bookings?.map(
-                    (item: any) => {
-                      return {
-                        name: `${getName(
-                          item?.user?.first_name,
-                          item?.user?.last_name
-                        )}(${item?.id})`,
-                        data: item,
-                      };
-                    }
-                  );
-                  return searchResult;
-                },
-              },
-              {
-                api: (searchText: string) => {
-                  return getAllClientEmpoyess({
-                    searchText: searchText,
-                    page: 1,
-                    count: 5,
-                    department: "",
-                    clientId: linkableId,
-                    // hasEmployeeId: true,
-                  });
-                },
-                key: "employees",
-                onSearchData: (payload: any) => {
-                  const searchResult = payload?.data?.associatedUsers?.map(
-                    (item: any) => {
-                      return {
-                        name: `${getName(item?.first_name, item?.last_name)} (${
-                          item?.email ? "email" : "phone"
-                        }: ${item?.email || item?.phone})`,
-                        data: item,
-                      };
-                    }
-                  );
-                  return searchResult;
-                },
-              },
-            ]}
+            // searchAPI={[
+            //   {
+            //     api: (searchText: string) => {
+            //       return getBookingWithFiltersAPI({
+            //         filters: {
+            //           searchText: searchText,
+            //           from: "hr",
+            //           page: 1,
+            //           count: 6,
+            //           status: "",
+            //           type: null,
+            //           id: linkableId,
+            //         },
+            //       });
+            //     },
+            //     key: "bookings",
+            //     onSearchData: (payload: any) => {
+            //       const searchResult = payload?.data?.bookings?.map(
+            //         (item: any) => {
+            //           return {
+            //             name: `${getName(
+            //               item?.user?.first_name,
+            //               item?.user?.last_name
+            //             )}(${item?.id})`,
+            //             data: item,
+            //           };
+            //         }
+            //       );
+            //       return searchResult;
+            //     },
+            //   },
+            //   {
+            //     api: (searchText: string) => {
+            //       return getAllClientEmpoyess({
+            //         searchText: searchText,
+            //         page: 1,
+            //         count: 5,
+            //         department: "",
+            //         clientId: linkableId,
+            //         // hasEmployeeId: true,
+            //       });
+            //     },
+            //     key: "employees",
+            //     onSearchData: (payload: any) => {
+            //       const searchResult = payload?.data?.associatedUsers?.map(
+            //         (item: any) => {
+            //           return {
+            //             name: `${getName(item?.first_name, item?.last_name)} (${
+            //               item?.email ? "email" : "phone"
+            //             }: ${item?.email || item?.phone})`,
+            //             data: item,
+            //           };
+            //         }
+            //       );
+            //       return searchResult;
+            //     },
+            //   },
+            // ]}
           />
         </div>
       </DashBoardHeaderStyled>
@@ -238,67 +235,67 @@ const MobileHeader = () => {
                     break;
                 }
               }}
-              searchAPI={[
-                {
-                  api: (searchText: string) => {
-                    return getBookingWithFiltersAPI({
-                      filters: {
-                        searchText: searchText,
-                        from: "hr",
-                        page: 1,
-                        count: 3,
-                        status: "",
-                        type: null,
-                        id: linkableId,
-                      },
-                    });
-                  },
-                  key: "bookings",
-                  onSearchData: (payload: any) => {
-                    const searchResult = payload?.data?.bookings?.map(
-                      (item: any) => {
-                        return {
-                          name: `${getName(
-                            item?.user?.first_name,
-                            item?.user?.last_name
-                          )}(${item?.id})`,
-                          data: item,
-                        };
-                      }
-                    );
-                    return searchResult;
-                  },
-                },
-                {
-                  api: (searchText: string) => {
-                    return getAllClientEmpoyess({
-                      searchText: searchText,
-                      page: 1,
-                      count: 3,
-                      department: "",
-                      clientId: linkableId,
-                      // hasEmployeeId: true,
-                    });
-                  },
-                  key: "employees",
-                  onSearchData: (payload: any) => {
-                    const searchResult = payload?.data?.associatedUsers?.map(
-                      (item: any) => {
-                        return {
-                          name: `${getName(
-                            item?.first_name,
-                            item?.last_name
-                          )} (${item?.email ? "email" : "phone"}: ${
-                            item?.email || item?.phone
-                          })`,
-                          data: item,
-                        };
-                      }
-                    );
-                    return searchResult;
-                  },
-                },
-              ]}
+              // searchAPI={[
+              //   {
+              //     api: (searchText: string) => {
+              //       return getBookingWithFiltersAPI({
+              //         filters: {
+              //           searchText: searchText,
+              //           from: "hr",
+              //           page: 1,
+              //           count: 3,
+              //           status: "",
+              //           type: null,
+              //           id: linkableId,
+              //         },
+              //       });
+              //     },
+              //     key: "bookings",
+              //     onSearchData: (payload: any) => {
+              //       const searchResult = payload?.data?.bookings?.map(
+              //         (item: any) => {
+              //           return {
+              //             name: `${getName(
+              //               item?.user?.first_name,
+              //               item?.user?.last_name
+              //             )}(${item?.id})`,
+              //             data: item,
+              //           };
+              //         }
+              //       );
+              //       return searchResult;
+              //     },
+              //   },
+              //   {
+              //     api: (searchText: string) => {
+              //       return getAllClientEmpoyess({
+              //         searchText: searchText,
+              //         page: 1,
+              //         count: 3,
+              //         department: "",
+              //         clientId: linkableId,
+              //         // hasEmployeeId: true,
+              //       });
+              //     },
+              //     key: "employees",
+              //     onSearchData: (payload: any) => {
+              //       const searchResult = payload?.data?.associatedUsers?.map(
+              //         (item: any) => {
+              //           return {
+              //             name: `${getName(
+              //               item?.first_name,
+              //               item?.last_name
+              //             )} (${item?.email ? "email" : "phone"}: ${
+              //               item?.email || item?.phone
+              //             })`,
+              //             data: item,
+              //           };
+              //         }
+              //       );
+              //       return searchResult;
+              //     },
+              //   },
+              // ]}
             />
           </div>
         )}

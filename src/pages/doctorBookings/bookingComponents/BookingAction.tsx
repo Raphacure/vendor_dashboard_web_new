@@ -1,18 +1,11 @@
 import SecoundaryButton from "@/components/custom/button/SecoundaryButton";
-import {
-  getAttachmentSignedUrl,
-  getBkInvoiceAPI,
-} from "@/redux/slices/bookingScreen/bookingScreenService";
-import { doctorInstantCallAPI } from "@/redux/slices/doctor/doctorService";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import InvoiceModal from "../InvoiceModal";
 import PrimaryButton from "@/components/custom/button/PrimaryButton";
 import { Mail, Phone, X } from "lucide-react";
 import { RiDownloadLine } from "react-icons/ri";
 import CustomModal from "@/components/custom/modal/CustomModal/CustomModal";
-import { Tooltip } from "antd";
 import useCustomModalRenderer from "@/components/custom/ModalRenderer/useCustomModalRenderer";
 import CustomModalRenderer from "@/components/custom/ModalRenderer/CustomModalRenderer";
 
@@ -35,21 +28,21 @@ const BookingAction = ({ data, time, instituteAction }: any) => {
   const patientNumber = data?.user?.phone || data?.user?.parent?.phone || "";
 
   const initiateCall = async () => {
-    const result = await dispatch(
-      doctorInstantCallAPI({
-        patient_name: patientName,
-        doctor_name: userName,
-        patient_number: patientNumber,
-        doctor_number: userNumber,
-        booking_id: data?.id,
-      })
-    );
-    if (result?.error) {
-      toast.error(result?.error?.message || "Something went wrong");
-      return;
-    }
-    toast.success("Call initiated successfully");
-    setShowCallConfirmation(false);
+    // const result = await dispatch(
+    //   doctorInstantCallAPI({
+    //     patient_name: patientName,
+    //     doctor_name: userName,
+    //     patient_number: patientNumber,
+    //     doctor_number: userNumber,
+    //     booking_id: data?.id,
+    //   })
+    // );
+    // if (result?.error) {
+    //   toast.error(result?.error?.message || "Something went wrong");
+    //   return;
+    // }
+    // toast.success("Call initiated successfully");
+    // setShowCallConfirmation(false);
   };
 
   const handleCall = () => {
@@ -78,28 +71,28 @@ const BookingAction = ({ data, time, instituteAction }: any) => {
       toast.error("Booking ID Not found");
       return;
     }
-    const res = (await dispatch(getBkInvoiceAPI(item?.id))) as any;
-    if (res?.error) {
-      toast.error(res?.error?.data?.message);
-    } else {
-      console.log("handleInvoiceClick res : ", res?.payload);
-      setInvoiceData(res?.payload || {});
-      setShowDownloadInvoiceModal(true);
-    }
+    // const res = (await dispatch(getBkInvoiceAPI(item?.id))) as any;
+    // if (res?.error) {
+    //   toast.error(res?.error?.data?.message);
+    // } else {
+    //   console.log("handleInvoiceClick res : ", res?.payload);
+    //   setInvoiceData(res?.payload || {});
+    //   setShowDownloadInvoiceModal(true);
+    // }
   };
 
   const handleReportClick = async (attachmentId: any) => {
     if (!attachmentId) return;
-    const res = (await dispatch(getAttachmentSignedUrl(attachmentId))) as any;
-    const url = res?.payload?.url;
-    if (url && (url.startsWith("http://") || url.startsWith("https://"))) {
-      // Open in new tab with small delay to avoid popup blocking
-      setTimeout(() => {
-        window.open(url, "_blank");
-      }, 300);
-    } else {
-      toast.error("Could not retrieve file URL.");
-    }
+    // const res = (await dispatch(getAttachmentSignedUrl(attachmentId))) as any;
+    // const url = res?.payload?.url;
+    // if (url && (url.startsWith("http://") || url.startsWith("https://"))) {
+    //   // Open in new tab with small delay to avoid popup blocking
+    //   setTimeout(() => {
+    //     window.open(url, "_blank");
+    //   }, 300);
+    // } else {
+    //   toast.error("Could not retrieve file URL.");
+    // }
   };
 
   const renderStatusSpecificActions = () => {

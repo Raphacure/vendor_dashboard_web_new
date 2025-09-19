@@ -109,7 +109,7 @@ const SignInModulev2 = () => {
     const body = {
       email: loginCredentials.email,
       password: loginCredentials.password,
-      role: "client_employee",
+      role: "vendor",
     };
     try {
       setIsLoading(true);

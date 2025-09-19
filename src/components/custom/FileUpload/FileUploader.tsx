@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import SecoundaryButton from '@/components/custom/button/SecoundaryButton';
 import React, { useRef, useState } from "react";
-import useUploadToS3 from '@/hooks/useUploadToS3';
+import useUploadToS3 from '@/hooks/upload/useUploadToS3';
 import { useSelector } from 'react-redux';
 
 type acceptTypeDto = "pdf" | "png" | "jpeg"

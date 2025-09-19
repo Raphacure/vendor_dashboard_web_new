@@ -644,13 +644,6 @@ export const parseAllDateFormats = (date = "")=>{
         parsedDate = new Date(year, month - 1, day);
       }
     }
-    // Handle MM/DD/YYYY format (US format)
-    else if (/^\d{2}\/\d{2}\/\d{4}$/.test(cleanDate)) {
-      const [month, day, year] = cleanDate.split('/').map(Number);
-      if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
-        parsedDate = new Date(year, month - 1, day);
-      }
-    }
     // Handle ISO format (2025-07-30T00:00:00.000Z)
     else if (/^\d{4}-\d{2}-\d{2}/.test(cleanDate)) {
       parsedDate = new Date(cleanDate);

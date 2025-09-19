@@ -2,120 +2,82 @@
 import fetch from "cross-fetch";
 import moment from "moment";
 import Axios from "axios";
+import store from "@/redux/store";
 
 export const getXFrontendHost = () => {
   const hostname = window.location.hostname;
   return hostname.replace("www.", "");
 };
 
-const handleError = (error: any) => {
-  // 
-}
+const apiClient = Axios.create({
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
-const gotoLoginPage = () => {
-  localStorage.removeItem("user");
-  window.location.reload()
-}
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = store.getState().auth.user?.accessToken;
 
-export const get = async function (url, { signal }={}) {
-  try {
-    const headers = {
-      "Content-Type": "application/json",
-      "x-frontend": getXFrontendHost(),
-      Authorization: "Bearer " + getToken(),
-    };
-    const response = await Axios.get(url, { headers, signal });
-    return response.data;
-  } catch (error) {
-    if (error?.response?.status == 401) {
-      gotoLoginPage();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+      config.headers["x-frontend"] = getXFrontendHost();
     }
-    throw new Error(
-      error?.response?.data?.message ||
-      error?.response?.data?.statusMessages?.[0]
-    );
-  }
-};
-export const put = async function (url, body = {}) {
-  try {
-    const headers = {
-      "Content-Type": "application/json",
-      "x-frontend": getXFrontendHost(),
-      Authorization: "Bearer " + getToken(),
-    };
-    const response = await Axios.put(url, body, { headers });
-    return response.data;
-  } catch (error) {
-    if (error?.response?.status == 401) {
-      gotoLoginPage();
-    }
-    throw new Error(
-      error?.response?.data?.message ||
-      error?.response?.data?.statusMessages?.[0]
-    );
-  }
-};
-export const post = async function (url, body = {}) {
-  try {
-    const headers = {
-      "Content-Type": "application/json",
-      "x-frontend": getXFrontendHost(),
-      Authorization: "Bearer " + getToken(),
-    };
-    const response = await Axios.post(url, body, { headers });
-    return response.data;
-  } catch (error) {
-    if (error?.response?.status == 401) {
-      gotoLoginPage();
-    }
-    throw new Error(
-      error?.response?.data?.message ||
-      error?.response?.data?.statusMessages?.[0]
-    );
-  }
-};
-export const del = async function (url, body = {}) {
-  try {
-    const headers = {
-      "Content-Type": "application/json",
-      "x-frontend": getXFrontendHost(),
-      Authorization: "Bearer " + getToken(),
-    };
-    const response = await Axios.delete(url, { headers });
-    return response.data;
-  } catch (error) {
-    if (error?.response?.status == 401) {
-      gotoLoginPage();
-    }
-    throw new Error(error?.response?.data?.statusMessages?.[0]);
-  }
-};
-export const patch = async function (url, body = {}) {
-  try {
-    const headers = {
-      "Content-Type": "application/json",
-      "x-frontend": getXFrontendHost(),
-      Authorization: "Bearer " + getToken(),
-    };
-    const response = await Axios.patch(url, body, { headers });
-    return response.data;
-  } catch (error) {
-    if (error?.response?.status == 401) {
-      gotoLoginPage();
-    }
-    throw new Error(
-      error?.response?.data?.message ||
-      error?.response?.data?.statusMessages?.[0]
-    );
-  }
-};
 
-export const getToken = () => {
-  const accessToken =
-    localStorage.getItem("user") &&
-      JSON.parse(localStorage.getItem("user")) &&
-      JSON.parse(localStorage.getItem("user"))?.accessToken
-      ? JSON.parse(localStorage.getItem("user")).accessToken
-      : undefined;
-  return accessToken;
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      store.dispatch(logoutUser());
+    }
+    return Promise.reject(error);
+  }
+);
+
+export const get = async function (url, { signal } = {}) {
+  try {
+    const response = await apiClient.get(url, { signal });
+    return response.data;
+  } catch (error) {
+    return Promise.reject(error?.response?.data);
+  }
+};
+export const put = async function (url, body = {}, { signal } = {}) {
+  try {
+    const response = await apiClient.put(url, body, { signal });
+    return response.data;
+  } catch (error) {
+    return Promise.reject(error?.response?.data);
+  }
+};
+export const post = async function (url, body = {}, { signal } = {}) {
+  try {
+    const response = await apiClient.post(url, body, { signal });
+    return response.data;
+  } catch (error) {
+    return Promise.reject(error?.response?.data);
+  }
+};
+export const del = async function (url, body = {}, { signal } = {}) {
+  try {
+    const response = await apiClient.delete(url, { signal });
+    return response.data;
+  } catch (error) {
+    return Promise.reject(error?.response?.data);
+  }
+};
+export const patch = async function (url, body = {}, { signal } = {}) {
+  try {
+    const response = await apiClient.patch(url, body, { signal });
+    return response.data;
+  } catch (error) {
+    return Promise.reject(error?.response?.data);
+  }
 };
