@@ -20,7 +20,7 @@ const RouteNotFound = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white text-center px-4">
       <div className="max-w-md">
-        <h1 className="text-9xl font-extrabold text-indigo-600">404</h1>
+        <h1 className="text-7xl font-extrabold text-[#252b61]">404</h1>
         <h2 className="mt-4 text-3xl font-bold text-gray-800 sm:text-4xl">
           Page Not Found
         </h2>
@@ -31,7 +31,7 @@ const RouteNotFound = () => {
         <div className="mt-8">
           <Link
             to="/"
-            className="inline-block !px-8 !py-3 text-lg font-semibold text-white bg-[#252b61] rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-transform transform hover:scale-105"
+            className="inline-block !px-8 !py-3 text-lg font-semibold text-[#252b61] border-1 border-[#252b61] rounded-3xl shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-transform transform hover:scale-105"
           >
             Go to Homepage
           </Link>

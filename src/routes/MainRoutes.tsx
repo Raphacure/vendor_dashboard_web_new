@@ -7,6 +7,7 @@ import MainLayout from "@/layout/MainLayout";
 import Booking from "@/pages/Bookings/Booking";
 import RouteNotFound from "@/components/Errors/RouteNotFound/RouteNotFound";
 import HealthcareVendorSystem from "@/pages/Dashboard/Dashboard";
+import CalendarPage from "@/pages/Calender/Calendar";
 
 const MainWrapper = () => {
   return (
@@ -23,6 +24,9 @@ const MainWrapper = () => {
               <Route path="/dashboard" element={<HealthcareVendorSystem />} />
 
               <Route path="/bookings/:status?" element={<Booking />} />
+              
+              {/* <Route path="/calender" element={<CalendarPage />} /> */}
+
               <Route path="*" element={<RouteNotFound/>} />
             </Route>
 

@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import { utils } from "xlsx";
 import { useDispatch } from "react-redux";
 import useVendorLinkableId from "@/hooks/auth/useVendorLinkableId";
+import { getToken } from "@/lib/helpers";
 
 interface DownloadFormProps {
   closeForm: () => void;
@@ -34,7 +35,6 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
   closeForm,
   sectionType,
 }) => {
-  const dispatch = useDispatch();
   const { linkableId } = useVendorLinkableId();
   const [selectedDuration, setSelectedDuration] = useState<Duration | null>({
     name: "1 Week",
@@ -65,42 +65,7 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
     },
     orders: {
       handleDownload: async () => {
-        try {
-          const response = (await dispatch(
-            getClientOrdersWithoutStateAPI({
-              page: 0,
-              count: 1000,
-              searchText: "",
-            })
-          )) as any;
-          if (response?.error) {
-            toast.error(response?.error?.message || "Unknown Error Occured");
-            return;
-          }
-          return response.payload.data?.clientOrders?.map((item: any) => {
-            return {
-              collection_1_date: item?.collection_1_date
-                ? moment(Number(item?.collection_1_date)).format("YYYY-MM-DD")
-                : "N/A",
-              collection_1_slot: item?.collection_1_slot
-                ? moment(Number(item?.collection_1_slot)).format("YYYY-MM-DD")
-                : "N/A",
-              final_amount: item?.final_amount,
-              id: item?.id,
-              invoice_date: item?.invoice_date
-                ? moment(Number(item?.invoice_date)).format("YYYY-MM-DD")
-                : "N/A",
-              status: item?.status,
-              bookings_count: item?.bookings_count,
-              created_at: item?.created_at
-                ? moment(Number(item?.created_at)).format("YYYY-MM-DD")
-                : "N/A",
-              clientId: item?.client?.id,
-            };
-          });
-        } catch (error) {
-          throw new Error("Failed to download file");
-        }
+
       },
     },
   };
