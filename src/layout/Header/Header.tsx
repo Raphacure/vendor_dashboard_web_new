@@ -3,6 +3,7 @@ import CommonSearch from "../../components/CommonSearch/CommonSearch";
 import { useNavigate } from "react-router";
 import { getName } from "@/lib/common";
 import useVendorDetails from "@/hooks/auth/useVendorDetails";
+import React from "react";
 
 const RaphaPlusHeader = () => {
   const navigate = useNavigate();
@@ -116,4 +117,4 @@ const RaphaPlusHeader = () => {
   );
 };
 
-export default RaphaPlusHeader;
+export default React.memo(RaphaPlusHeader);

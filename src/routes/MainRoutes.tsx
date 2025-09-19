@@ -4,8 +4,9 @@ import SignInPage from "@/pages/Signin/SignInPage";
 import { ProtectedAfterLogin, ProtectedBeforeLogin } from "./ProtectedRoutes";
 import SuspenceBoundary from "./SuspenceBoundary";
 import MainLayout from "@/layout/MainLayout";
-import Booking from "@/pages/doctorBookings/Booking";
+import Booking from "@/pages/Bookings/Booking";
 import RouteNotFound from "@/components/Errors/RouteNotFound/RouteNotFound";
+import HealthcareVendorSystem from "@/pages/Dashboard/Dashboard";
 
 const MainWrapper = () => {
   return (
@@ -19,6 +20,7 @@ const MainWrapper = () => {
 
             <Route element={<ProtectedBeforeLogin />}>
               <Route path="/" element={<App />} />
+              <Route path="/dashboard" element={<HealthcareVendorSystem />} />
 
               <Route path="/bookings/:status?" element={<Booking />} />
               <Route path="*" element={<RouteNotFound/>} />
