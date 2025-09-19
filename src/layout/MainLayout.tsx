@@ -93,7 +93,7 @@ const MainLayout = () => {
             </div>
           )}
           <div
-            className={`w-100 overflow-y-auto ${
+            className={`w-full overflow-y-auto ${
               finalRenderState.header && !isProtected
                 ? "max-h-[100vh]"
                 : "max-h-[calc(100vh-89px)]"

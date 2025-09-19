@@ -7,8 +7,8 @@ const RouteNotFound = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimer((pre) => pre-1);
-    },1000);
+      setTimer((pre) => pre - 1);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, []);
@@ -35,9 +35,7 @@ const RouteNotFound = () => {
           >
             Go to Homepage
           </Link>
-          <p className="mt-2">
-            going back in {timer} seconds
-          </p>
+          <p className="mt-2">going back in {timer} seconds</p>
         </div>
       </div>
     </div>

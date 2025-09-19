@@ -1,7 +1,6 @@
-import React, { useMemo, ChangeEvent, useState, useEffect } from "react";
+import React, { useMemo } from "react";
 import { Table, TableProps } from "antd";
 import CustomSpinLoader from "@/components/loader/SpinLoader/CustomSpinLoader";
-import "antd/dist/reset.css";
 import { StyledTableContainer } from "./CustomTable.styled";
 import CustomPagination from "./Pagination/CustomPagination";
 import { ColumnProps } from 'antd/es/table';
