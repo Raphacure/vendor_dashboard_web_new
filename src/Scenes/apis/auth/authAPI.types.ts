@@ -112,14 +112,14 @@ export type VendorGraphQLFormattedError = {
   message: string;
   locations: { line: number; column: number }[];
   path: (string | number)[];
-}
+};
 
 export type VendorErrorResponse = {
   data: {
     vendorById: null;
   };
   errors: VendorGraphQLFormattedError[];
-}
+};
 
 export type VendorApiResponse = {
   data: {
@@ -127,3 +127,8 @@ export type VendorApiResponse = {
   };
 };
 
+export type userLoginPayload = {
+  email: string;
+  password: string;
+  role: string;
+};

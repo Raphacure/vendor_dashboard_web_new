@@ -4,10 +4,12 @@ import { persistStore } from "redux-persist";
 // reducers
 import authReducer from "../slices/auth/authSlice";
 import appReducer from "../slices/app/Appslice"
+import vendorReducer from "../slices/vendor/vendorslice"
 
 const rootReducer = combineReducers({
   auth: authReducer,
   app:appReducer,
+  vendor:vendorReducer
 });
 
 const store = configureStore({

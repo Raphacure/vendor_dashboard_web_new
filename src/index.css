@@ -119,4 +119,16 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  img,
+  svg,
+  video,
+  canvas,
+  audio,
+  iframe,
+  embed,
+  object {
+    display: inline;
+    vertical-align: baseline; 
+  }
 }

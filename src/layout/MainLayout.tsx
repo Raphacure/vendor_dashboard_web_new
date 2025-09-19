@@ -12,8 +12,8 @@ import Loader from "@/components/loader/loader/Loader";
 import { useIsProtected } from "@/components/Auth/Protected/ProtectedComponent";
 import { checkIsMobile, getCurrentRoute } from "@/lib/common";
 import useVendorLinkableId from "@/hooks/auth/useVendorLinkableId";
-import { getVendorDetailsAPI } from "@/redux/slices/auth/authService";
 import { locationsDetails } from "./Layout.constants";
+import { getVendorDetailsThunk } from "@/redux/slices/vendor/vendorService";
 
 const MemoizedRaphaPlusHeader = React.memo(RaphaPlusHeader);
 const MemoizedSidebar = React.memo(Sidebar);
@@ -60,7 +60,7 @@ const MainLayout = () => {
 
   useEffect(() => {
     if (linkableId) {
-      dispatch(getVendorDetailsAPI({ id: linkableId }));
+      dispatch(getVendorDetailsThunk({ id: linkableId }));
     }
   }, [linkableId, dispatch]);
 

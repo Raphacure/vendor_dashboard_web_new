@@ -599,12 +599,12 @@ const Booking = () => {
                 dataIndex: "user",
                 render: (value, row) => {
                   return (
-                    <p
+                    <span
                       onClick={() => handleRowClick(row?.user?.id)}
                       className="name !text-blue-600 cursor-pointer"
                     >
                       {getName(value?.first_name, value?.last_name)}
-                    </p>
+                    </span>
                   );
                 },
               },

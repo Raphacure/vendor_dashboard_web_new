@@ -1,6 +1,22 @@
-import { Link } from "react-router";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router";
 
 const RouteNotFound = () => {
+  const navigate = useNavigate();
+  const [timer, setTimer] = useState(5);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimer((pre) => pre-1);
+    },1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  if (timer === 0) {
+    navigate(-1);
+  }
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white text-center px-4">
       <div className="max-w-md">
@@ -19,6 +35,9 @@ const RouteNotFound = () => {
           >
             Go to Homepage
           </Link>
+          <p className="mt-2">
+            going back in {timer} seconds
+          </p>
         </div>
       </div>
     </div>

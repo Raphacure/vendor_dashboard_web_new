@@ -3,7 +3,7 @@ import useVendorLinkableId from "./useVendorLinkableId";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import toast from "react-hot-toast";
-import { getVendorDetailsAPI } from "@/redux/slices/auth/authService";
+import { getVendorDetailsThunk } from "@/redux/slices/vendor/vendorService";
 
 const useVendorDetails = ({
   refetchOnMount,
@@ -13,12 +13,12 @@ const useVendorDetails = ({
   const dispatch: AppDispatch = useDispatch();
   const { linkableId } = useVendorLinkableId();
   const { data, error, loading } = useSelector(
-    (store: RootState) => store.auth.vendorDetails
+    (store: RootState) => store.vendor.vendorDetails
   );
 
   const fetchVendorDetails = useCallback(() => {
     if (linkableId) {
-      dispatch(getVendorDetailsAPI({ id: linkableId }));
+      dispatch(getVendorDetailsThunk({ id: linkableId }));
     }
   }, [dispatch, linkableId]);
 
