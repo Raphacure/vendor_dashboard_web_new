@@ -2,11 +2,11 @@ import { RaphaPlusHeaderStyled } from "./Header.styled";
 import CommonSearch from "../../components/CommonSearch/CommonSearch";
 import { useNavigate } from "react-router";
 import { getName } from "@/lib/common";
+import useVendorDetails from "@/hooks/auth/useVendorDetails";
 
 const RaphaPlusHeader = () => {
   const navigate = useNavigate();
-  const { clientDetails, linkableId: clientId } = {}
-  const logo_url = clientDetails?.logo_url;
+  const {linkableId,vendorDetails} = useVendorDetails()
 
   return (
     <RaphaPlusHeaderStyled>
@@ -14,7 +14,7 @@ const RaphaPlusHeader = () => {
         <div>
           <img
             src={
-              logo_url ||
+              vendorDetails?.image ||
               "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/105748-1743583353705.png"
             }
             alt="Rapha-plus-logo"
@@ -22,7 +22,7 @@ const RaphaPlusHeader = () => {
           />
         </div>
       </div>
-      {clientId && (
+      {linkableId && (
         <>
           <div className="search-container">
             <CommonSearch
@@ -107,7 +107,7 @@ const RaphaPlusHeader = () => {
           </div>
           <div className="flex items-center justify-end">
             <p className="text-xl m-0 font-bold italic">
-              {clientDetails?.name ?? ""}
+              {vendorDetails?.name ?? ""}
             </p>
           </div>
         </>

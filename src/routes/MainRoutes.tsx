@@ -14,16 +14,16 @@ const MainWrapper = () => {
         <Route element={<MainLayout />}>
           <Route element={<SuspenceBoundary />}>
             <Route element={<ProtectedAfterLogin />}>
-              <Route id="signin" path="/signin" element={<SignInPage />} />
+              <Route path="/signin" element={<SignInPage />} />
             </Route>
 
             <Route element={<ProtectedBeforeLogin />}>
               <Route path="/" element={<App />} />
 
               <Route path="/bookings/:status?" element={<Booking />} />
+              <Route path="*" element={<RouteNotFound/>} />
             </Route>
 
-            <Route path="*" element={<RouteNotFound/>} />
           </Route>
         </Route>
       </Routes>

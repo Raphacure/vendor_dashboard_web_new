@@ -9,12 +9,18 @@ import Sidebar from "@/layout/SideBar/Sidebar";
 import Loader from "@/components/loader/loader/Loader";
 import { useIsProtected } from "@/components/Auth/Protected/ProtectedComponent";
 import { locationsDetails } from "./Layout.constants";
-import { RootState } from "@/redux/store";
+import { AppDispatch, RootState } from "@/redux/store";
+import useVendorLinkableId from "@/hooks/auth/useVendorLinkableId";
+import { getVendorDetailsAPI } from "@/redux/slices/auth/authService";
 
 const MainLayout = (props: any) => {
   const navigate = useNavigate();
 
   const isProtected = useIsProtected();
+
+  const { linkableId} = useVendorLinkableId()
+
+  const dispatch:AppDispatch = useDispatch()
 
   const { fullScreenloading, routeScreenLoading } = useSelector(
     (store: RootState) => store.app.loading
@@ -36,6 +42,12 @@ const MainLayout = (props: any) => {
     () => locationsDetails.find((item) => item.name === currentPathKey),
     [currentPathKey]
   );
+
+  useEffect(()=>{
+    if(linkableId){
+      dispatch(getVendorDetailsAPI({id:linkableId}))
+    }
+  },[linkableId,dispatch])
 
   const locationState = location.state === null ? undefined : location.state;
 

@@ -69,7 +69,61 @@ export type User = {
 };
 
 export type LoginResponseApi = {
-    data?: User,
-    success: boolean,
-    message?: string,
-} 
+  data?: User;
+  success: boolean;
+  message?: string;
+};
+
+export type Vendor = {
+  id: number;
+  name: string;
+  phone: string;
+  primary_email: string;
+  secondary_email: string;
+  slot_start_time: string;
+  slot_end_time: string;
+  week_off_days: string;
+  address: string;
+  state: string;
+  city: string;
+  zip: number;
+  image: string;
+  parent_id: number | null;
+  mapped_pin_codes: string;
+  instant_pin_codes: string;
+  rating: number;
+  search_keys: string;
+  type: string;
+  status: string;
+  vendor_client_id: string | null;
+  is_premium: boolean;
+  spoc_contact_first_name: string;
+  spoc_contact_last_name: string | null;
+  spoc_contact_phone_no: string;
+  spoc_contact_email: string;
+  spoc_contact_office_no: string | null;
+  spoc_contact_designation: string | null;
+  doctors: any[];
+  parentVendor: any | null;
+  spocs: any | null;
+};
+
+export type VendorGraphQLFormattedError = {
+  message: string;
+  locations: { line: number; column: number }[];
+  path: (string | number)[];
+}
+
+export type VendorErrorResponse = {
+  data: {
+    vendorById: null;
+  };
+  errors: VendorGraphQLFormattedError[];
+}
+
+export type VendorApiResponse = {
+  data: {
+    vendorById: Vendor;
+  };
+};
+

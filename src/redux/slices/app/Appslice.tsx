@@ -5,7 +5,7 @@ type AppState = {
     loading:{
         fullScreenloading:boolean,
         routeScreenLoading:boolean
-    }
+    },
 }
 
 const initialState:AppState = {
