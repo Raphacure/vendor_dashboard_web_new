@@ -1,26 +1,19 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import { persistStore, persistReducer } from "redux-persist";
-import storage from "redux-persist/lib/storage";
+import { persistStore } from "redux-persist";
 
 // reducers
 import authReducer from "../slices/auth/authSlice";
 import appReducer from "../slices/app/Appslice"
+import vendorReducer from "../slices/vendor/vendorslice"
 
 const rootReducer = combineReducers({
   auth: authReducer,
   app:appReducer,
+  vendor:vendorReducer
 });
 
-const persistConfig = {
-  key: "vendor-portel",
-  storage: storage,
-  whitelist: ["auth"], 
-};
-
-const persistedReducer = persistReducer(persistConfig, rootReducer);
-
 const store = configureStore({
-  reducer: persistedReducer,
+  reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,

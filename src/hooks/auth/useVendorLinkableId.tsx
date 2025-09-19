@@ -10,7 +10,7 @@ const useVendorLinkableId = () => {
     );
   });
 
-  const linkableId = clientRole?.linkable_id;
+  const linkableId = clientRole?.linkable_id || undefined;
 
   return { linkableId, };
 };

@@ -277,13 +277,13 @@ const CommonSearch: React.FC<CommonSearchProps> = ({
           const searchPromises = apisToExecute.map(
             async (searchAPIFunc, index) => {
               try {
-                const result = await dispatch(searchAPIFunc(currentSearchTerm));
+                const result = await searchAPIFunc(currentSearchTerm);
 
                 if (controller.signal.aborted) return null;
 
                 if (
-                  result?.error ||
-                  result?.meta?.requestStatus !== "fulfilled"
+                  result?.meta?.requestStatus &&
+                  (result?.error || result?.meta?.requestStatus !== "fulfilled")
                 ) {
                   console.warn(
                     `Search API ${index + 1} (${keysToExecute[index]}) failed:`,
@@ -292,7 +292,7 @@ const CommonSearch: React.FC<CommonSearchProps> = ({
                   return null;
                 } else {
                   const handler = handlersToExecute[index];
-                  const processedData = handler(result?.payload) ?? [];
+                  const processedData = handler(result) ?? [];
 
                   // Add the key to each search item to identify its source
                   return processedData.map((item: SearchItem) => ({

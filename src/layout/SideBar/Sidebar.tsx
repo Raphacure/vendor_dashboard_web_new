@@ -3,6 +3,8 @@ import React, { useState, useLayoutEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router";
 import Logout from "@/components/logout/Logout";
 import { FaChevronRight } from "react-icons/fa6";
+import { useDispatch } from "react-redux";
+import { dispatchUserLogout } from "@/redux/slices/auth/authSlice";
 
 interface SubmenuItem {
   name: string;
@@ -164,10 +166,10 @@ const Sidebar = () => {
   const [indicatorStyle, setIndicatorStyle] = useState({ top: 0, height: 0 });
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
 
   const menuRef = useRef<HTMLDivElement>(null);
   const activeItemRef = useRef<HTMLDivElement>(null);
-
 
   const filteredMenuItems = React.useMemo(() => {
     return menuItems;
@@ -202,7 +204,7 @@ const Sidebar = () => {
         if (activeItemRef.current && menuRef.current) {
           setIndicatorStyle({
             top: activeItemRef.current.offsetTop,
-            height: activeItemRef.current.clientHeight
+            height: activeItemRef.current.clientHeight,
           });
         }
       };
@@ -211,43 +213,50 @@ const Sidebar = () => {
     }
   }, [location.pathname, filteredMenuItems]);
 
-  const handleItemClick = React.useCallback((item: MenuItem) => {
-    if (item.openInNewTab) {
-      window.open(item.path, "_blank");
-      return;
-    }
-
-    if (activeTab !== item.name) {
-      setActiveSubMenu(null);
-    }
-    setActiveTab(item.name);
-    navigate(item.path);
-
-    requestAnimationFrame(() => {
-      const activeElement = document.querySelector(`.menu-item[data-item="${item.name}"]`);
-      if (activeElement && menuRef.current) {
-        setIndicatorStyle({
-          top: (activeElement as HTMLElement).offsetTop,
-          height: activeElement.clientHeight
-        });
+  const handleItemClick = React.useCallback(
+    (item: MenuItem) => {
+      if (item.openInNewTab) {
+        window.open(item.path, "_blank");
+        return;
       }
-    });
-  }, [activeTab, navigate]);
 
-  const handleSubItemClick = React.useCallback((subItem: SubmenuItem, parentItem: MenuItem) => {
-    if (subItem.openInNewTab) {
-      window.open(subItem.path, "_blank");
-      return;
-    }
-    setActiveSubMenu(subItem.name);
-    setActiveTab(parentItem.name);
-    navigate(subItem.path);
-  }, [navigate]);
+      if (activeTab !== item.name) {
+        setActiveSubMenu(null);
+      }
+      setActiveTab(item.name);
+      navigate(item.path);
+
+      requestAnimationFrame(() => {
+        const activeElement = document.querySelector(
+          `.menu-item[data-item="${item.name}"]`
+        );
+        if (activeElement && menuRef.current) {
+          setIndicatorStyle({
+            top: (activeElement as HTMLElement).offsetTop,
+            height: activeElement.clientHeight,
+          });
+        }
+      });
+    },
+    [activeTab, navigate]
+  );
+
+  const handleSubItemClick = React.useCallback(
+    (subItem: SubmenuItem, parentItem: MenuItem) => {
+      if (subItem.openInNewTab) {
+        window.open(subItem.path, "_blank");
+        return;
+      }
+      setActiveSubMenu(subItem.name);
+      setActiveTab(parentItem.name);
+      navigate(subItem.path);
+    },
+    [navigate]
+  );
 
   const handleLogout = React.useCallback(() => {
-    localStorage.clear();
-    window.location.href = "/signin";
-  }, []);
+    dispatch(dispatchUserLogout());
+  }, [dispatch]);
 
   return (
     <SidebarStyled>
@@ -266,15 +275,19 @@ const Sidebar = () => {
             style={{
               transform: `translateY(${indicatorStyle.top}px)`,
               height: `${indicatorStyle.height}px`,
-              opacity: activeTab ? 1 : 0
+              opacity: activeTab ? 1 : 0,
             }}
           />
 
           {filteredMenuItems.map((item, index) => (
-            <div key={item.name} style={{ "--item-index": index } as React.CSSProperties}>
+            <div
+              key={item.name}
+              style={{ "--item-index": index } as React.CSSProperties}
+            >
               <div
-                className={`menu-item ${activeTab === item.name ? "active" : ""
-                  } ${item?.hasSubMenu ? "has-sub-menu" : ""}`}
+                className={`menu-item ${
+                  activeTab === item.name ? "active" : ""
+                } ${item?.hasSubMenu ? "has-sub-menu" : ""}`}
                 data-item={item.name}
                 ref={activeTab === item.name ? activeItemRef : null}
                 onClick={() => handleItemClick(item)}
@@ -299,8 +312,9 @@ const Sidebar = () => {
                   {item.subMenuItems?.map((subItem) => (
                     <div
                       key={subItem.name}
-                      className={`submenu-item ${activeSubMenu === subItem?.name ? "active" : ""
-                        }`}
+                      className={`submenu-item ${
+                        activeSubMenu === subItem?.name ? "active" : ""
+                      }`}
                       onClick={(e) => {
                         e.stopPropagation();
                         handleSubItemClick(subItem, item);
@@ -317,10 +331,7 @@ const Sidebar = () => {
         </div>
 
         <div className="bottom-section">
-          <div
-            className="logout"
-            onClick={() => setLogOutShow(true)}
-          >
+          <div className="logout" onClick={() => setLogOutShow(true)}>
             <img
               src="https://raphacure-public-images.s3.ap-south-1.amazonaws.com/120521-1738066580891.png"
               alt="Logout"

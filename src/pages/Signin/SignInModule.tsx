@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { SignInModuleStyled } from "./SignInModule.styled";
-import { Form } from "react-bootstrap";
+import { Input } from "antd"; // Changed import from 'react-bootstrap' to 'antd'
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import { loginUser } from "@/redux/slices/auth/authService";
@@ -97,9 +97,9 @@ const SignInModulev2 = () => {
     );
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  // Corrected event type from FormEvent to MouseEvent as it's a button click
+  const handleSubmit = async (event: React.MouseEvent<HTMLElement>) => {
+    // event.preventDefault() is not needed for a button onClick that is not submitting a form
     const isValid = handleSubmitValidation();
 
     if (!isValid) {
@@ -157,73 +157,63 @@ const SignInModulev2 = () => {
                 A smart platform designed for corporate HR teams to manage
                 employee health, wellness programs, and clinic services
               </p>
-              <>
-                <div className="mb-6">
-                  <Form.Group className="w-full">
-                    <Form.Label
-                      htmlFor="email"
-                      className={`flex-1  ${"text-indigo-900 font-medium mb-1 "}`}
-                    >
-                      Email
-                    </Form.Label>
-                    <Form.Control
-                      type="email"
-                      placeholder="Enter your email"
-                      className="w-full py-3 px-4 border rounded-md"
-                      value={loginCredentials.email}
-                      onChange={(e) => {
-                        handleloginCredentialsChange("email", e.target.value);
-                      }}
-                      id="email"
-                      name="email"
-                      autoComplete="email"
-                      required
-                    />
-                    {errors.email && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.email}
-                      </p>
-                    )}
-                  </Form.Group>
-                </div>
-              </>
-              <>
-                <div className="mb-6">
-                  <Form.Group className="w-full">
-                    <Form.Label
-                      htmlFor="password"
-                      className={`flex-1  ${"text-indigo-900 font-medium mb-1 "}`}
-                    >
-                      Password
-                    </Form.Label>
-                    <Form.Control
-                      type="password"
-                      placeholder="Enter your password"
-                      className="w-full py-3 px-4 border rounded-md"
-                      value={loginCredentials.password}
-                      onChange={(e) => {
-                        handleloginCredentialsChange(
-                          "password",
-                          e.target.value
-                        );
-                      }}
-                      id="password"
-                      name="password"
-                      autoComplete="current-password"
-                      required
-                    />
-                    {errors.password && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.password}
-                      </p>
-                    )}
-                  </Form.Group>
-                </div>
-              </>
+              {/* --- Start of Changes --- */}
+              <div className="mb-6">
+                <label
+                  htmlFor="email"
+                  className="block text-indigo-900 font-medium mb-1"
+                >
+                  Email
+                </label>
+                <Input
+                  type="email"
+                  placeholder="Enter your email"
+                  size="large" // Controls size similar to py-3
+                  className="w-full"
+                  value={loginCredentials.email}
+                  onChange={(e) => {
+                    handleloginCredentialsChange("email", e.target.value);
+                  }}
+                  id="email"
+                  name="email"
+                  autoComplete="email"
+                  required
+                  status={errors.email ? "error" : ""} // AntD way to show error state
+                />
+                {errors.email && (
+                  <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                )}
+              </div>
+              <div className="mb-6">
+                <label
+                  htmlFor="password"
+                  className="block text-indigo-900 font-medium mb-1"
+                >
+                  Password
+                </label>
+                <Input.Password // Specific AntD component for passwords with a visibility toggle
+                  placeholder="Enter your password"
+                  size="large"
+                  className="w-full"
+                  value={loginCredentials.password}
+                  onChange={(e) => {
+                    handleloginCredentialsChange("password", e.target.value);
+                  }}
+                  id="password"
+                  name="password"
+                  autoComplete="current-password"
+                  required
+                  status={errors.password ? "error" : ""}
+                />
+                {errors.password && (
+                  <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+                )}
+              </div>
+              {/* --- End of Changes --- */}
               <div className="mt-4">
                 <PrimaryButton
                   isLoading={isLoading}
-                  onClick={(e: any) => handleSubmit(e)}
+                  onClick={handleSubmit} // Simplified onClick handler
                   className={`w-full py-2 bg-indigo-900 text-white !rounded-3xl font-medium ${
                     isButtonDisabled ? "opacity-50 cursor-not-allowed" : ""
                   }`}
@@ -241,6 +231,7 @@ const SignInModulev2 = () => {
                     href="https://raphacure.com/terms"
                     target="_blank"
                     className="text-black font-medium !no-underline"
+                    rel="noreferrer"
                   >
                     Terms & Conditions
                   </a>{" "}
@@ -249,6 +240,7 @@ const SignInModulev2 = () => {
                     href="https://raphacure.com/privacy-policy"
                     target="_blank"
                     className="text-black font-medium !no-underline"
+                    rel="noreferrer"
                   >
                     Privacy Policy
                   </a>

@@ -1,17 +1,34 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { loginUser } from "./authService";
-import { LoginResponseApi, User } from "@/types/api/authapi.types";
+import storage from "redux-persist/lib/storage";
+import persistReducer from "redux-persist/es/persistReducer";
+import {
+  LoginResponseApi,
+  User,
+  VendorApiResponse,
+  VendorErrorResponse,
+} from "@/Scenes/apis/auth/authAPI.types";
 
 export interface AuthState {
   loading: boolean;
   user: User | null;
   error: any;
+  vendorDetails: {
+    data: VendorApiResponse["data"]["vendorById"] | null;
+    loading: boolean;
+    error: any;
+  };
 }
 
 const initialState: AuthState = {
   loading: false,
   user: null,
   error: null,
+  vendorDetails: {
+    data: null,
+    error: null,
+    loading: false,
+  },
 };
 
 export const authSlice = createSlice({
@@ -26,6 +43,7 @@ export const authSlice = createSlice({
     },
   },
   extraReducers: (builder: any) => {
+    //user auth
     builder.addCase(loginUser.pending, (state: AuthState) => {
       state.loading = true;
       state.error = null;
@@ -53,4 +71,10 @@ export const authSlice = createSlice({
 
 export const { dispatchUserLogout, setAuthLoading } = authSlice.actions;
 
-export default authSlice.reducer;
+const authPersistConfig = {
+  key: "auth",
+  storage,
+  whitelist: ["user"],
+};
+
+export default persistReducer(authPersistConfig, authSlice.reducer);

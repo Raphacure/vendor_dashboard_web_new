@@ -2,16 +2,19 @@ import moment from "moment";
 import { DownloadFormStyled } from "./DownloadForm.styled";
 import { useState } from "react";
 import { MdCancel } from "react-icons/md";
-import { Col, Form, Row } from "react-bootstrap";
+import { Col, Row, DatePicker, Form } from "antd"; // Changed import from react-bootstrap to antd
 import PrimaryButton from "@/components/custom/button/PrimaryButton";
 import { SERVER_IP } from "@/lib/config";
 import toast from "react-hot-toast";
 import { utils } from "xlsx";
 import { useDispatch } from "react-redux";
+import useVendorLinkableId from "@/hooks/auth/useVendorLinkableId";
+import { getToken } from "@/lib/helpers";
+
 interface DownloadFormProps {
   closeForm: () => void;
   sectionType: "bookings" | "orders";
-  dateFilter?:boolean
+  dateFilter?: boolean;
 }
 
 interface Duration {
@@ -32,8 +35,7 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
   closeForm,
   sectionType,
 }) => {
-  const dispatch = useDispatch();
-  const { linkableId } = useClientLinkableId();
+  const { linkableId } = useVendorLinkableId();
   const [selectedDuration, setSelectedDuration] = useState<Duration | null>({
     name: "1 Week",
     duration: {
@@ -63,42 +65,7 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
     },
     orders: {
       handleDownload: async () => {
-        try {
-          const response = (await dispatch(
-            getClientOrdersWithoutStateAPI({
-              page: 0,
-              count: 1000,
-              searchText: "",
-            })
-          )) as any;
-          if (response?.error) {
-            toast.error(response?.error?.message || "Unknown Error Occured");
-            return;
-          }
-          return response.payload.data?.clientOrders?.map((item: any) => {
-            return {
-              collection_1_date: item?.collection_1_date
-                ? moment(Number(item?.collection_1_date)).format("YYYY-MM-DD")
-                : "N/A",
-              collection_1_slot: item?.collection_1_slot
-                ? moment(Number(item?.collection_1_slot)).format("YYYY-MM-DD")
-                : "N/A",
-              final_amount: item?.final_amount,
-              id: item?.id,
-              invoice_date: item?.invoice_date
-                ? moment(Number(item?.invoice_date)).format("YYYY-MM-DD")
-                : "N/A",
-              status: item?.status,
-              bookings_count: item?.bookings_count,
-              created_at: item?.created_at
-                ? moment(Number(item?.created_at)).format("YYYY-MM-DD")
-                : "N/A",
-              clientId: item?.client?.id,
-            };
-          });
-        } catch (error) {
-          throw new Error("Failed to download file");
-        }
+
       },
     },
   };
@@ -301,24 +268,22 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
             Created
           </label>
         </div>
+        
+        {/* --- Start: Refactored Section with Ant Design --- */}
         {selectedDuration?.name === "custom date" && (
-          <Row>
-            <Col>
-              <Form.Group controlId="formBasicstartDate">
-                <Form.Label>Start Date</Form.Label>
-                <Form.Control
-                  type="date"
-                  onFocus={(e: React.FocusEvent<HTMLInputElement>) => {
-                    const target = e.target as HTMLInputElement & {
-                      showPicker?: () => void;
-                    };
-                    target.showPicker?.();
-                  }}
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="Start Date">
+                <DatePicker
+                  style={{ width: "100%" }}
                   placeholder="Start Date"
-                  max={moment().format("YYYY-MM-DD")}
-                  onChange={(e) => {
+                  disabledDate={(current) =>
+                    current && current > moment().endOf("day")
+                  }
+                  onChange={(date, dateString) => {
+                    if (!dateString) return;
                     const selectedStartDate = () =>
-                      moment(e.target.value).format("YYYY-MM-DD");
+                      moment(dateString).format("YYYY-MM-DD");
                     setSelectedDuration((prev) => {
                       if (!prev) return null;
                       return {
@@ -336,25 +301,27 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
                     });
                   }}
                 />
-              </Form.Group>
+              </Form.Item>
             </Col>
-            <Col>
-              <Form.Group controlId="formBasicendDate">
-                <Form.Label>End Date</Form.Label>
-                <Form.Control
-                  type="date"
+            <Col span={12}>
+              <Form.Item label="End Date">
+                <DatePicker
+                  style={{ width: "100%" }}
                   placeholder="End Date"
-                  onFocus={(e: React.FocusEvent<HTMLInputElement>) => {
-                    const target = e.target as HTMLInputElement & {
-                      showPicker?: () => void;
-                    };
-                    target.showPicker?.();
+                  disabledDate={(current) => {
+                    const startDate = selectedDuration?.duration?.startDate?.();
+                    const isAfterToday =
+                      current && current > moment().endOf("day");
+                    const isBeforeStartDate =
+                      startDate &&
+                      current &&
+                      current < moment(startDate).startOf("day");
+                    return !!(isAfterToday || isBeforeStartDate);
                   }}
-                  max={moment().format("YYYY-MM-DD")}
-                  min={selectedDuration?.duration?.startDate?.() || ""}
-                  onChange={(e) => {
+                  onChange={(date, dateString) => {
+                    if (!dateString) return;
                     const selectedEndDate = () =>
-                      moment(e.target.value).format("YYYY-MM-DD");
+                      moment(dateString).format("YYYY-MM-DD");
                     setSelectedDuration((prev) => {
                       if (!prev) return null;
                       return {
@@ -367,10 +334,11 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
                     });
                   }}
                 />
-              </Form.Group>
+              </Form.Item>
             </Col>
           </Row>
         )}
+        {/* --- End: Refactored Section --- */}
 
         <PrimaryButton
           onClick={onDownloadExcell}

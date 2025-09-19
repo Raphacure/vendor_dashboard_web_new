@@ -17,7 +17,7 @@ const apiClient = Axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
-    const token = store.getState().auth.user?.accessToken;
+    const token = getToken();
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -81,3 +81,7 @@ export const patch = async function (url, body = {}, { signal } = {}) {
     return Promise.reject(error?.response?.data);
   }
 };
+
+export const getToken  = ()=>{
+  return store.getState().auth.user?.accessToken;
+}

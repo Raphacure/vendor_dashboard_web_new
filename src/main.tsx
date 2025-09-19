@@ -5,12 +5,10 @@ import { Provider } from "react-redux";
 import store, { persistorStore } from "@/redux/store/index";
 import { Toaster } from "react-hot-toast";
 import MainWrapper from "@/routes/MainRoutes";
-import "bootstrap/dist/css/bootstrap.min.css";
 import {
   registerServiceWorker,
   isServiceWorkerSupported,
 } from "@/lib/register-service-worker";
-import "antd/dist/reset.css";
 import { PersistGate } from "redux-persist/integration/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 

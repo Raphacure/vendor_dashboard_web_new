@@ -1657,7 +1657,7 @@ export const getVendorsForCity = (city: any, packageCode: any) => {
   return queryObj;
 };
 
-export const getAllVendorsByApiQueryInVenders = (id: any) => {
+export const getAllVendorsByApiQueryInVenders = ({ id }: { id: string }) => {
   const queryObj = {
     query: `
       query{vendorById(id:"${id}"){
