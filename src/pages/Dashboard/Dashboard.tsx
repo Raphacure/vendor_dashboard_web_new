@@ -3664,7 +3664,7 @@ const HealthcareVendorSystem = () => {
       </div>
 
       <div
-        style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}
+        style={{ display: "grid", gridTemplateColumns: "1fr", gap: "20px" }}
       >
         {/* Left Column */}
         <div>
@@ -3736,9 +3736,9 @@ const HealthcareVendorSystem = () => {
         </div>
 
         {/* Right Column */}
-        <div>
+        {/* <div>
           <Calendar />
-        </div>
+        </div> */}
       </div>
 
       {/* Active Leads Table */}

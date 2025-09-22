@@ -1,32 +1,21 @@
 import type { BadgeProps, CalendarMode, CalendarProps } from "antd";
-import {
-  Calendar,
-  Spin,
-  Select,
-  Button
-} from "antd";
+import { Calendar, Spin, Select, Button } from "antd";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
-import { getBookingWithFiltersAPI } from "@/redux/slices/dashboard/dashboardService";
-import { useDispatch } from "react-redux";
+import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import DateRender from "./components/RenderCells/DateRender";
-import {
-  LoadingOutlined
-} from "@ant-design/icons";
+import { LoadingOutlined } from "@ant-design/icons";
 import { CalendarStyled } from "./Calendar.style";
 import CustomToolTip from "@/components/custom/ToolTip/CustomToolTip";
-import BookingDetailsModal from "../doctorBookings/bookingModals/modals/bookingDetailsModal/BookingDetailsModal";
-import { getAllSelfLeaveRequestsAPI } from "@/redux/slices/attendance/attendanceService";
-import { formatStatus } from "@/lib/common";
+import { formatStatus, parseAllDateFormats } from "@/lib/common";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import SecoundaryButton from "@/components/custom/button/SecoundaryButton";
-import useClientLinkableId from "@/hooks/auth/useClientLinkableId";
+import useVendorLinkableId from "@/hooks/auth/useVendorLinkableId";
+import { useGetBookings } from "@/hooks/useQuerys/bookings/bookingsQuery";
 
 const CalendarPage = () => {
-  const dispatch = useDispatch() as any;
-  const { linkableId } = useClientLinkableId();
+  const { linkableId } = useVendorLinkableId();
 
   const [selectedValue, setSelectedValue] = useState(() => dayjs(new Date()));
   const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs(new Date()));
@@ -63,172 +52,66 @@ const CalendarPage = () => {
 
   const [loading, setLoading] = useState(false);
   const [bookings, setBookings] = useState<Map<string, any>>(new Map());
-  const [leaveRequests, setLeaveRequests] = useState<Map<string, any>>(
-    new Map()
-  );
 
-  console.log("selectedValue", bookings);
+  const dateRange = useMemo(() => {
+    if (!selectedValue) return null;
+    const from = selectedValue
+      .startOf(mode === "month" ? "month" : "year")
+      .format("YYYY-MM-DD");
+    const to = selectedValue
+      .endOf(mode === "month" ? "month" : "year")
+      .format("YYYY-MM-DD");
+    return {
+      dateType: "scheduled",
+      from: from,
+      to: to,
+    };
+  }, [mode, selectedValue]);
 
-  const getAllBookings = async (from: string, to: string) => {
-    try {
-      setLoading(true);
-      const leavePromise = dispatch(
-        getAllSelfLeaveRequestsAPI({
-          start_date: from,
-          end_date: to,
-          status: "approved",
-        })
-      ) as any;
-      const bookingPromise = dispatch(
-        getBookingWithFiltersAPI({
-          filters: {
-            from: "hr",
-            status: "booking_scheduled,consultation_rescheduled,open,completed",
-            // type: null,
-            // id: String(linkableId),
-            count: 10000,
-            dateRange: {
-              dateType: "scheduled",
-              from: from,
-              to: to,
-            },
-          },
-        })
-      ) as any;
-      const [leaveResult, bookingResult] = (await Promise.allSettled([
-        leavePromise,
-        bookingPromise,
-      ])) as any;
+  const {
+    data: bookingsData,
+    isLoading: bookingsLoading,
+    isError: bookingsError,
+  } = useGetBookings({
+    from: "vendor",
+    status:
+      "booking_scheduled,consultation_rescheduled,open,completed,sample_collected",
+    id: String(linkableId),
+    pageSize: 10000,
+    page: 1,
+    ...(dateRange ? { dateRange } : {}),
+  });
 
-      if (bookingResult?.value?.error) {
-        toast.error(
-          bookingResult?.value?.error?.message || "Unknown Error Occured"
-        );
-        return;
-      }
-      if (mode === "month") {
-        const dataMap = new Map();
-        bookingResult?.value?.payload?.data?.bookings.forEach(
-          (booking: any) => {
-            if (booking?.collection_1_date) {
-              const dateKey = dayjs(booking?.collection_1_date).format("DD/MM/YYYY");
-              if (dataMap.has(dateKey)) {
-                dataMap.set(dateKey, [
-                  ...dataMap.get(dateKey),
-                  booking,
-                ]);
-              } else {
-                dataMap.set(dateKey, [booking]);
-              }
-            }
-          }
-        );
-        setBookings(dataMap);
-
-        const leavesMap = leaveResult?.value?.payload?.reduce(
-          (acc: any, curr: any) => {
-            curr?.leave_time?.forEach((leave: any) => {
-              if (
-                acc.has(dayjs(leave?.date, "YYYY-MM-DD").format("DD/MM/YYYY"))
-              ) {
-                acc.set(dayjs(leave?.date, "YYYY-MM-DD").format("DD/MM/YYYY"), [
-                  ...acc.get(
-                    dayjs(leave?.date, "YYYY-MM-DD").format("DD/MM/YYYY")
-                  ),
-                  {
-                    type: leave?.type,
-                    reason: curr?.reason,
-                    leaveType: curr?.type,
-                  },
-                ]);
-              } else {
-                acc.set(dayjs(leave?.date, "YYYY-MM-DD").format("DD/MM/YYYY"), [
-                  {
-                    type: leave?.type,
-                    reason: curr?.reason,
-                    leaveType: curr?.type,
-                  },
-                ]);
-              }
-            });
-            return acc;
-          },
-          new Map()
-        );
-        setLeaveRequests(leavesMap);
-      } else if (mode === "year") {
-        const dataMap = new Map();
-        bookingResult?.value?.payload?.data?.bookings.forEach(
-          (booking: any) => {
-            if (booking?.collection_1_date) {
-              console.log("collection_1_date", booking?.collection_1_date);
-              const dateKey = dayjs(booking?.collection_1_date).format("MM/YYYY");
-              console.log(
-                "format",
-                dateKey
-              );
-              if (dataMap.has(dateKey)) {
-                dataMap.set(dateKey, [
-                  ...dataMap.get(dateKey),
-                  booking,
-                ]);
-              } else {
-                dataMap.set(dateKey, [booking]);
-              }
-            }
-          }
-        );
-        setBookings(dataMap);
-        setBookings(dataMap);
-        const leavesMap = leaveResult?.value?.payload?.reduce(
-          (acc: any, curr: any) => {
-            curr?.leave_time?.forEach((leave: any) => {
-              if (acc.has(dayjs(leave?.date, "YYYY-MM-DD").format("MM/YYYY"))) {
-                acc.set(dayjs(leave?.date, "YYYY-MM-DD").format("MM/YYYY"), [
-                  ...acc.get(
-                    dayjs(leave?.date, "YYYY-MM-DD").format("MM/YYYY")
-                  ),
-                  {
-                    type: leave?.type,
-                    reason: curr?.reason,
-                    leaveType: curr?.type,
-                  },
-                ]);
-              } else {
-                acc.set(dayjs(leave?.date, "YYYY-MM-DD").format("MM/YYYY"), [
-                  leave,
-                ]);
-              }
-            });
-            return acc;
-          },
-          new Map()
-        );
-        setLeaveRequests(leavesMap);
-      }
-    } catch (error) {
-      toast.error("unknown error occured");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  console.log("bookings", bookings);
-  console.log("leaveRequests", leaveRequests);
+  console.log("bookings",bookings)
 
   useEffect(() => {
-    if (linkableId) {
-      if (mode === "month") {
-        const from = selectedValue.startOf("month").format("YYYY-MM-DD");
-        const to = selectedValue.endOf("month").format("YYYY-MM-DD");
-        getAllBookings(from, to);
-      } else if (mode === "year") {
-        const from = selectedValue.startOf("year").format("YYYY-MM-DD");
-        const to = selectedValue.endOf("year").format("YYYY-MM-DD");
-        getAllBookings(from, to);
-      }
+    if (bookingsData?.data?.bookings) {
+      const dataMap = new Map();
+      bookingsData.data.bookings.forEach((booking: any) => {
+        if (booking?.collection_1_date) {
+          const dateKey = dayjs(booking?.collection_1_date, "DD/MM/YYYY").format(
+            "DD/MM/YYYY"
+          );
+          if (dataMap.has(dateKey)) {
+            dataMap.set(dateKey, [...dataMap.get(dateKey), booking]);
+          } else {
+            dataMap.set(dateKey, [booking]);
+          }
+        }
+      });
+      setBookings(dataMap);
     }
-  }, [dispatch, linkableId, selectedValue.toISOString(), mode]);
+  }, [bookingsData]);
+
+  useEffect(() => {
+    setLoading(bookingsLoading);
+  }, [bookingsLoading]);
+
+  useEffect(() => {
+    if (bookingsError) {
+      toast.error("Failed to fetch bookings.");
+    }
+  }, [bookingsError]);
 
   //
 
@@ -253,14 +136,13 @@ const CalendarPage = () => {
 
   const monthCellRender = (value: Dayjs) => {
     const dateBookings = bookings.get(value.format("MM/YYYY"));
-    const dateLeaves = leaveRequests.get(value.format("MM/YYYY"));
     return (
       <DateRender
         handleShowMore={handleShowMore}
         bookings={dateBookings}
         current={value}
         loading={loading}
-        leaves={dateLeaves}
+        // leaves={dateLeaves}
         mode={mode}
         handleBookingDetailsModalOpen={handleBookingDetailsModalOpen}
       />
@@ -269,13 +151,12 @@ const CalendarPage = () => {
 
   const dateCellRender = (value: Dayjs) => {
     const dateBookings = bookings.get(value.format("DD/MM/YYYY"));
-    const dateLeaves = leaveRequests.get(value.format("DD/MM/YYYY"));
     return (
       <DateRender
         handleShowMore={handleShowMore}
         bookings={dateBookings}
         current={value}
-        leaves={dateLeaves}
+        // leaves={dateLeaves}
         loading={loading}
         mode={mode}
         handleBookingDetailsModalOpen={handleBookingDetailsModalOpen}
@@ -511,13 +392,13 @@ const CalendarPage = () => {
                   headerRender={customHeaderRender}
                 />
               </Spin>
-              {isBookingDetailsModalOpen && (
+              {/* {isBookingDetailsModalOpen && (
                 <BookingDetailsModal
                   handleClose={handleBookingDetailsModalClose}
                   modalData={selectedBooking}
                   handleSoftClose={handleBookingDetailsModalClose}
                 />
-              )}
+              )} */}
             </div>
           </div>
           {/* <div className="basis-1/4 flex-grow-0">

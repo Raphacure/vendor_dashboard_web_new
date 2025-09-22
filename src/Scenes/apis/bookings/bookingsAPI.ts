@@ -4,7 +4,7 @@ import { BookingQueryParams } from "./bookingsAPI.types";
 
 export const getAllBookingsAPI = (
   queryParams: BookingQueryParams,
-  { signal }: any={}
+  { signal }: { signal?: AbortSignal } 
 ) => {
   return post(
     `${SERVER_IP}/api/v1/booking/getBookings?marketplace_name=raphacure`,

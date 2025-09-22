@@ -20,8 +20,6 @@ interface MenuItem {
   openInNewTab: boolean;
   hasSubMenu?: boolean;
   subMenuItems?: SubmenuItem[];
-  requiredHeadDoctor?: boolean;
-  isOhcClinicRequired?: boolean;
 }
 
 const menuItems: MenuItem[] = [
@@ -34,29 +32,29 @@ const menuItems: MenuItem[] = [
     path: "/dashboard",
     openInNewTab: false,
   },
+  // {
+  //   name: "Data Analytics",
+  //   img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419857892.png",
+  //   whiteImg:
+  //     "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419877370.png",
+  //   path: "/data-analytics",
+  //   openInNewTab: false,
+  // },
+  // {
+  //   name: "Quick Links",
+  //   img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/76907-1743505603326.png",
+  //   whiteImg:
+  //     "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/76907-1743505603326.png",
+  //   // path: "/dashboard",
+  //   path: "/quick-links",
+  //   openInNewTab: false,
+  // },
   {
-    name: "Data Analytics",
-    img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419857892.png",
-    whiteImg:
-      "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419877370.png",
-    path: "/data-analytics",
-    openInNewTab: false,
-  },
-  {
-    name: "Quick Links",
+    name: "Leads",
     img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/76907-1743505603326.png",
     whiteImg:
       "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/76907-1743505603326.png",
-    // path: "/dashboard",
-    path: "/quick-links",
-    openInNewTab: false,
-  },
-  {
-    name: "Orders",
-    img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/31020-1754293230653.svg",
-    whiteImg:
-      "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/31020-1754293366982.svg",
-    path: "/orders",
+    path: "/leads",
     openInNewTab: false,
   },
   {
@@ -67,32 +65,39 @@ const menuItems: MenuItem[] = [
     path: "/bookings/all",
     openInNewTab: false,
   },
-  {
-    name: "My Clients",
-    img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419622833.png",
-    whiteImg:
-      "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419698378.png",
-    path: "/MyClients",
-    openInNewTab: false,
-  },
+  // {
+  //   name: "My Clients",
+  //   img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419622833.png",
+  //   whiteImg:
+  //     "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419698378.png",
+  //   path: "/MyClients",
+  //   openInNewTab: false,
+  // },
 
   {
-    name: "Packages Requested",
+    name: "Catalogue",
     img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1757401687133.svg",
     whiteImg:
       "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1757401735668.svg",
     path: "/packages",
     openInNewTab: false,
+    hasSubMenu: true,
+    subMenuItems: [
+      {
+        name: "Manage RFQ",
+        path: "/manage-rfq",
+      },
+    ],
   },
 
-  {
-    name: "My Employees",
-    img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/31020-1754293567456.svg",
-    whiteImg:
-      "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/31020-1754293602216.svg",
-    path: "/employees",
-    openInNewTab: false,
-  },
+  // {
+  //   name: "My Employees",
+  //   img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/31020-1754293567456.svg",
+  //   whiteImg:
+  //     "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/31020-1754293602216.svg",
+  //   path: "/employees",
+  //   openInNewTab: false,
+  // },
   {
     name: "RFQ",
     img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419893082.png",
@@ -109,14 +114,14 @@ const menuItems: MenuItem[] = [
   //   path: "/communication-map",
   //   openInNewTab: false,
   // },
-  {
-    name: "Manage Users",
-    img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419792542.png",
-    whiteImg:
-      "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419830326.png",
-    path: "/ManageUsers",
-    openInNewTab: false,
-  },
+  // {
+  //   name: "Manage Users",
+  //   img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419792542.png",
+  //   whiteImg:
+  //     "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419830326.png",
+  //   path: "/ManageUsers",
+  //   openInNewTab: false,
+  // },
   {
     name: "Tickets",
     img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/106435-1742984246183.png",
@@ -125,14 +130,14 @@ const menuItems: MenuItem[] = [
     path: "/tickets",
     openInNewTab: false,
   },
-  {
-    name: "Community",
-    img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419792542.png",
-    whiteImg:
-      "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419830326.png",
-    path: "/communities",
-    openInNewTab: false,
-  },
+  // {
+  //   name: "Community",
+  //   img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419792542.png",
+  //   whiteImg:
+  //     "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419830326.png",
+  //   path: "/communities",
+  //   openInNewTab: false,
+  // },
   {
     name: "My Calendar",
     img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/31020-1754293673090.svg",
@@ -280,35 +285,39 @@ const Sidebar = () => {
           />
 
           {filteredMenuItems.map((item, index) => (
-            <div
-              key={item.name}
-              style={{ "--item-index": index } as React.CSSProperties}
-            >
+            <div className="main-menu-div">
               <div
-                className={`menu-item ${
-                  activeTab === item.name ? "active" : ""
-                } ${item?.hasSubMenu ? "has-sub-menu" : ""}`}
-                data-item={item.name}
-                ref={activeTab === item.name ? activeItemRef : null}
-                onClick={() => handleItemClick(item)}
+                key={item.name}
+                style={{ "--item-index": index } as React.CSSProperties}
               >
-                <img
-                  src={activeTab === item.name ? item.whiteImg : item.img}
-                  alt={item.name}
-                  className="logo"
-                />
-                <span>{item.name}</span>
+                <div
+                  className={`menu-item ${
+                    activeTab === item.name ? "active" : ""
+                  } ${item?.hasSubMenu ? "has-sub-menu" : ""}`}
+                  data-item={item.name}
+                  ref={activeTab === item.name ? activeItemRef : null}
+                  onClick={() => handleItemClick(item)}
+                >
+                  <img
+                    src={activeTab === item.name ? item.whiteImg : item.img}
+                    alt={item.name}
+                    className="logo"
+                  />
+                  <span>{item.name}</span>
 
-                {item.hasSubMenu && (
-                  <div className="chevron-icon">
-                    <FaChevronRight />
-                  </div>
-                )}
+                  {item.hasSubMenu && (
+                    <div className="chevron-icon">
+                      <FaChevronRight />
+                    </div>
+                  )}
+                </div>
               </div>
-
               {item.hasSubMenu && (
-                <div className="submenu-container">
-                  <div className="submenu-divider"></div>
+                <div
+                  className={`submenu-container ${
+                    activeTab === item.name ? "active" : ""
+                  }`}
+                >
                   {item.subMenuItems?.map((subItem) => (
                     <div
                       key={subItem.name}

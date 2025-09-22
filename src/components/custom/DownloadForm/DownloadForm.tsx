@@ -13,7 +13,7 @@ import { getToken } from "@/lib/helpers";
 
 interface DownloadFormProps {
   closeForm: () => void;
-  sectionType: "bookings" | "orders";
+  sectionType: "bookings" | "orders" | "leads";
   dateFilter?: boolean;
 }
 

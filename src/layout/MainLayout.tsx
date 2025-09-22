@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Outlet, useLocation } from "react-router";
+import { Outlet, useLocation, useMatch, useMatches } from "react-router";
 import { AppDispatch, RootState } from "@/redux/store";
 
 import RaphaPlusHeader from "@/layout/Header/Header";
@@ -40,6 +40,9 @@ const MainLayout = () => {
       ) ?? "Dashboard",
     [location.pathname]
   );
+
+  const matches = useMatches()
+  console.log("matches", matches)
 
   const matchedLocation = useMemo(
     () => locationsDetails.find((item) => item.name === currentPathKey),
