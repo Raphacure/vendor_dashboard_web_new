@@ -1,17 +1,25 @@
 import App from "@/App";
 import { createBrowserRouter, RouterProvider } from "react-router";
-import SignInPage from "@/pages/Signin/SignInPage";
 import { ProtectedAfterLogin, ProtectedBeforeLogin } from "./ProtectedRoutes";
 import SuspenceBoundary from "./SuspenceBoundary";
 import MainLayout from "@/layout/MainLayout";
-import Booking from "@/pages/Bookings/Booking";
-import RouteNotFound from "@/components/Errors/RouteNotFound/RouteNotFound";
-import HealthcareVendorSystem from "@/pages/Dashboard/Dashboard";
-import CalendarPage from "@/pages/Calender/Calendar";
-import Leads from "@/pages/Leads/Leads";
-import ManageRfq from "@/pages/ManageRfq/ManageRfq";
-import ManageTickets from "@/pages/ManageTickets/ManageTickets";
-import DashboardProfile from "@/pages/Dashboard/DashboardProfile";
+import { lazy } from "react";
+
+const SignInPage = lazy(() => import("@/pages/Signin/SignInPage"));
+const Booking = lazy(() => import("@/pages/Bookings/Booking"));
+const RouteNotFound = lazy(
+  () => import("@/components/Errors/RouteNotFound/RouteNotFound"),
+);
+const HealthcareVendorSystem = lazy(
+  () => import("@/pages/Dashboard/Dashboard"),
+);
+const CalendarPage = lazy(() => import("@/pages/Calender/Calendar"));
+const Leads = lazy(() => import("@/pages/Leads/Leads"));
+const ManageRfq = lazy(() => import("@/pages/ManageRfq/ManageRfq"));
+const ManageTickets = lazy(() => import("@/pages/ManageTickets/ManageTickets"));
+const DashboardProfile = lazy(
+  () => import("@/pages/Dashboard/DashboardProfile"),
+);
 
 const router = createBrowserRouter([
   {
