@@ -1,5 +1,5 @@
 import { post, put } from "@/lib/helpers";
-import { CreateTicketBody, getAllTicketsBody, TicketsResponse } from "./ticketAPI.types";
+import { CreateTicketBody, getAllTicketsBody } from "./ticketAPI.types";
 import { SERVER_IP } from "@/lib/config";
 
 

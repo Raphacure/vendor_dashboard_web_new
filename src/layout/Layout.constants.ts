@@ -1,23 +1,58 @@
-import { Sidebar } from "lucide-react";
+import { useMatches } from "react-router";
 
-export const locationsDetails = [
+type RouteLayout = {
+  noRender?: {
+    search?: boolean;
+    header?: boolean;
+    sidebar?: boolean;
+    mobileHeader?: boolean;
+    mobileFooter?: boolean;
+  };
+  render?: {
+    dashboardHeader?: boolean;
+  };
+  title?:string
+};
+
+const locationsDetails = [
   {
-    name: "signin",
-    state: {
-      noRender: { mobilefooter: true, search: true, header:true,sidebar:true},
+    layout: {
+      noRender: {
+        mobileFooter: true,
+        search: true,
+        header: true,
+        sidebar: true,
+      },
+      title:"signin"
     },
-    path: "/signin",
-    id:"signin"
+    id: "signin",
   },
   {
-    name: "Dashboard",
-    state: { render:{dashboardHeader: true}, noRender: { header:true } },
-    path: "/dashboard",
-    id:"dashboard"
+    layout: {
+      noRender: { mobileFooter: true },
+      title:"dashboard"
+    },
+    id: "dashboardProfile",
   },
   {
-    name: "Dashboard Profile",
-    path: "/dashboard/profile",
-    id:"dashboard_profile"
+    layout: {
+      render: { dashboardHeader: true },
+      title:"dashboard"
+    },
+    id: "dashboard",
   },
 ];
+
+export const getRouteLayout = (id: string): RouteLayout => {
+  const location = locationsDetails.find((item) => item.id === id);
+  return location?.layout ?? {};
+};
+
+export const useRouteLayout = () => {
+  const matches = useMatches();
+  const matchedRoute = matches[matches.length - 1];
+
+  const layout = getRouteLayout(matchedRoute?.id);
+
+  return layout;
+};

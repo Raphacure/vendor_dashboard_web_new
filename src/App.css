@@ -72,8 +72,8 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 @media (max-width: 675px) {
-  .ant-picker-panels{
-    flex-direction:column;
+  .ant-picker-panels {
+    flex-direction: column;
   }
 }
 
@@ -112,4 +112,13 @@ input[type="number"]::-webkit-inner-spin-button {
 
 .ant-form .ant-select-selector {
   border: 1px solid #aeaeae !important;
+}
+
+.ant-select-selector {
+  border-radius: 25px !important;
+  border: 1px solid #252b61 !important;
+}
+.ant-picker {
+  border-radius: 25px !important;
+  border: 1px solid #252b61 !important;
 }

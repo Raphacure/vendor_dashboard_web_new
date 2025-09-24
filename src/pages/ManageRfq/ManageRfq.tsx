@@ -38,10 +38,10 @@ const ManageRfq = ({
     rfqTotalRecord,
     loading: rfqLoading,
   } = {
-    rfqList:[],
-    rfqTotalRecord:10,
+    rfqList: [],
+    rfqTotalRecord: 10,
     loading: false,
-  }
+  };
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [activeTab, setActiveTab] = useState("1");
   const SubscriptionType: any = true;
@@ -176,8 +176,8 @@ const ManageRfq = ({
       key: "rfq_name",
       dataIndex: "rfq_name",
       render: (item: any) => {
-        return formatStatus(item)
-      }
+        return formatStatus(item);
+      },
     },
     {
       label: "Submittion Date",
@@ -257,7 +257,9 @@ const ManageRfq = ({
               ) : (
                 <p
                   className={`capitalize ${
-                  itemV?.status === "approved" ? "text-green-600" : "text-red-500"
+                    itemV?.status === "approved"
+                      ? "text-green-600"
+                      : "text-red-500"
                   }`}
                 >
                   {itemV?.status}
@@ -277,14 +279,12 @@ const ManageRfq = ({
           {loading && <Loader />}
           <div className="content getinTouchPage">
             <h2>RFQ</h2>
-            <div className="create-new-institute-sec-content-all d-flex align-items-end justify-content-between">
-              <div className="student-fields-sec-content-all deltape-form w-50 d-flex flex-column">
-                <div className="student-info-row w-100 ">
-                  <CommonSearchBox
-                    className="h-10"
-                    onSearch={handleChangeValue}
-                  />
-                </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <CommonSearchBox
+                  className="h-10"
+                  onSearch={handleChangeValue}
+                />
               </div>
               <div>
                 <PrimaryButton

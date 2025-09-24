@@ -1,17 +1,16 @@
 import PrimaryButton from "@/components/custom/button/PrimaryButton";
 import SecoundaryButton from "@/components/custom/button/SecoundaryButton";
 import CustomModal from "@/components/custom/modal/CustomModal/CustomModal";
+import { CreateTicketBody } from "@/Scenes/apis/ticket/ticketAPI.types";
+import { createTicketAPI } from "@/Scenes/apis/ticket/ticketsAPI";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
-import { Form } from "react-bootstrap";
+import { Form, Input } from "antd";
 import toast from "react-hot-toast";
-import { useDispatch } from "react-redux";
 
 type prop = {
   isEdit: boolean;
   onHide: () => void;
-  onSuccess: () => void;
-  defaultData?: ticketFormDto;
-  selectedId?: number;
 };
 
 type ticketFormDto = {
@@ -26,70 +25,74 @@ type FormErrors = {
   status?: string;
 };
 
-const TicketForm = ({
-  isEdit,
-  onHide,
-  onSuccess,
-  defaultData,
-  selectedId,
-}: prop) => {
-  const [formData, setFormData] = useState<ticketFormDto>(
-    defaultData ?? {
-      subject: "",
-      description: "",
-      status: "",
-    }
-  );
+const TicketForm = ({ isEdit, onHide }: prop) => {
+  const [formData, setFormData] = useState<ticketFormDto>({
+    subject: "",
+    description: "",
+    status: "",
+  });
   const [errors, setErrors] = useState<FormErrors>({});
-  const dispatch = useDispatch();
 
-  const validateField = useCallback(
-    (name: string, value: string): string | undefined => {
-      switch (name) {
-        case "subject":
-          if (!value.trim()) return "Title is required";
-          if (value.length < 3) return "Title must be at least 3 characters";
-          break;
-      }
-      return undefined;
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: ({
+      payload,
+      signal,
+    }: {
+      payload: CreateTicketBody;
+      signal: AbortSignal;
+    }) => {
+      return createTicketAPI(payload, { signal });
     },
-    []
-  );
+    onSuccess: () => {
+      toast.success("Ticket created successfully!");
+      queryClient.invalidateQueries({ queryKey: ["tickets"] });
+      onHide();
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to create ticket");
+    },
+  });
 
-  console.log(errors, "errors");
+  const validateField = (name: string, value: string): string | undefined => {
+    switch (name) {
+      case "subject":
+        if (!value.trim()) return "Title is required";
+        if (value.length < 3) return "Title must be at least 3 characters";
+        break;
+    }
+    return undefined;
+  };
 
   const handleSubmit = useCallback(async () => {
     const newErrors: FormErrors = {};
 
-    Object.entries(formData).forEach(([key, value]) => {
+    const fieldsToValidate: Array<keyof ticketFormDto> = [
+      "subject",
+      "description",
+    ];
+
+    fieldsToValidate.forEach((key) => {
+      const value = formData[key];
       const error = validateField(key, value ?? "");
-      if (error) newErrors[key as keyof ticketFormDto] = error;
+      if (error) newErrors[key] = error;
     });
 
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length !== 0) return;
 
-    console.log("Form submitted:", formData);
-    let res: any = null;
+    const { status, ...payload } = formData;
 
-    if (isEdit) {
-      res = await dispatch(updateTickets({ id: selectedId, body: formData }));
-    } else {
-      res = await dispatch(createTickets({...formData,status:"open"}));
-    }
-
-    if (res?.payload?.success) {
-      toast.success(`Ticket ${isEdit ? "updated" : "created"} successfully!.`);
-      onSuccess();
-    } else {
-      toast.error(res?.error?.message || "Something went wrong!.");
-    }
-  }, [formData, validateField, isEdit, selectedId]);
+    mutation.mutate({
+      payload: payload,
+      signal: new AbortController().signal,
+    });
+  }, [formData, mutation]);
 
   const handleChange = useCallback((e: any) => {
     const { name, value } = e.target;
-
     setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
     setFormData((prev) => ({ ...prev, [name]: value }));
   }, []);
@@ -101,24 +104,22 @@ const TicketForm = ({
       title={`${isEdit ? "Edit" : "Create"} Ticket`}
     >
       <CustomModal.Body>
-        <Form noValidate>
-          <Form.Group controlId="formTitle" className="mb-3">
-            <Form.Label>Title</Form.Label>
-            <Form.Control
+        <Form onFinish={handleSubmit} noValidate>
+          <Form.Item
+            label="Title"
+            validateStatus={errors.subject ? "error" : ""}
+            help={errors.subject}
+            className="mb-3"
+          >
+            <Input
               type="text"
               placeholder="Enter title"
               name="subject"
               value={formData.subject}
               onChange={handleChange}
-              isInvalid={!!errors.subject}
             />
-            <Form.Control.Feedback type="invalid">
-              {errors.subject}
-            </Form.Control.Feedback>
-          </Form.Group>
-          {/* <Form.Group controlId="formTitle" className="mb-3">
-            <Form.Label>Status</Form.Label>
-            <br />
+          </Form.Item>
+          {/* <Form.Item label="Status" className="mb-3">
             <Select
               className="w-full !h-[38px]"
               getPopupContainer={(trigger) => trigger.parentElement}
@@ -141,33 +142,27 @@ const TicketForm = ({
                 setFormData((prev) => ({ ...prev, status: e }));
               }}
             />
-            <Form.Control.Feedback type="invalid">
-              {errors.subject}
-            </Form.Control.Feedback>
-          </Form.Group> */}
+          </Form.Item> */}
 
-          <Form.Group controlId="formDescription" className="mb-3">
-            <Form.Label>Description</Form.Label>
-            <Form.Control
-              as="textarea"
+          <Form.Item
+            label="Description"
+            validateStatus={errors.description ? "error" : ""}
+            help={errors.description}
+            className="mb-3"
+          >
+            <Input.TextArea
               rows={3}
               placeholder="Enter description"
               name="description"
               value={formData.description}
               onChange={handleChange}
-              isInvalid={!!errors.description}
             />
-            <Form.Control.Feedback type="invalid">
-              {errors.description}
-            </Form.Control.Feedback>
-          </Form.Group>
+          </Form.Item>
         </Form>
       </CustomModal.Body>
       <CustomModal.Footer>
         <div className="flex justify-end gap-2">
-          <SecoundaryButton onClick={onHide}>
-            Cancel
-          </SecoundaryButton>
+          <SecoundaryButton onClick={onHide}>Cancel</SecoundaryButton>
           <PrimaryButton
             className="!bg-[#252b61] border-0 !border-transparent !text-white"
             type="button"

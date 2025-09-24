@@ -1,6 +1,6 @@
 import { SidebarStyled } from "./Sidebar.styled";
 import React, { useState, useLayoutEffect, useRef } from "react";
-import { useNavigate, useLocation } from "react-router";
+import { useNavigate, useLocation, useMatches } from "react-router";
 import Logout from "@/components/logout/Logout";
 import { FaChevronRight } from "react-icons/fa6";
 import { useDispatch } from "react-redux";
@@ -202,19 +202,29 @@ const Sidebar = () => {
       setActiveSubMenu(null);
     }
 
+    const updateIndicator = () => {
+      if (activeItemRef.current && menuRef.current) {
+        setIndicatorStyle({
+          top: activeItemRef.current.offsetTop,
+          height: activeItemRef.current.clientHeight,
+        });
+      }
+    };
+
     if (activeItem) {
       setActiveTab(activeItem.name);
-
-      const updateIndicator = () => {
-        if (activeItemRef.current && menuRef.current) {
-          setIndicatorStyle({
-            top: activeItemRef.current.offsetTop,
-            height: activeItemRef.current.clientHeight,
-          });
-        }
-      };
-
       requestAnimationFrame(updateIndicator);
+    }
+
+    // Add ResizeObserver here to re-calculate indicator style when layout changes due to submenu expansion
+    if (menuRef.current) {
+      const resizeObserver = new ResizeObserver(() => {
+        requestAnimationFrame(updateIndicator);
+      });
+      resizeObserver.observe(menuRef.current);
+      return () => {
+        resizeObserver.disconnect();
+      };
     }
   }, [location.pathname, filteredMenuItems]);
 

@@ -5,6 +5,7 @@ export type getAllTicketsBody = {
     search_text?: string;
     page?: number;
     count?: number;
+    from?: string;
   };
 };
 
@@ -49,6 +50,6 @@ export type TicketsErrorResponse = {
 
 
 export type CreateTicketBody = {
-  ubject: string;
+  subject: string;
   description?: string;
 }

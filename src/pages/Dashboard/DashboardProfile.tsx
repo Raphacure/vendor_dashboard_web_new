@@ -5,6 +5,9 @@ import styled from "styled-components";
 import { useNavigate } from "react-router";
 import Logout from "@/components/logout/Logout";
 import useVendorDetails from "@/hooks/auth/useVendorDetails";
+import { useDispatch } from "react-redux";
+import { dispatchUserLogout } from "@/redux/slices/auth/authSlice";
+import { checkIsMobile } from "@/lib/common";
 
 const DashboardProfileStyled = styled.div`
   padding: 15px;
@@ -121,12 +124,17 @@ const DashboardProfileStyled = styled.div`
 const DashboardProfile = () => {
   const navigate = useNavigate() as any;
   const [isLogoutOpen, setIsLogoutOpen] = useState(false);
-  const {vendorDetails} = useVendorDetails()
+  const { vendorDetails } = useVendorDetails();
+  const dispatch = useDispatch();
 
   const handleLogout = () => {
-    localStorage.clear();
-    window.location.href = "/signin";
+    dispatch(dispatchUserLogout());
   };
+
+  if (!checkIsMobile()) {
+    navigate("/");
+  }
+
   return (
     <DashboardProfileStyled>
       <div className="profile-contents">

@@ -1,30 +1,40 @@
-import { useCallback, useState } from "react";
-import { Select } from "antd";
-import { Col, Form, Row } from "react-bootstrap";
-import ManageTicketsStyled from "./ManageTickets.Styled";
+import { useMemo, useState } from "react";
+import { Col, Row, Select } from "antd";
 import CustomTable from "@/components/custom/Table/CustomTable/CustomTable";
 import PrimaryButton from "@/components/custom/button/PrimaryButton";
 import CommonSearchBox from "@/components/custom/search/CommonSearchBox";
 import CommonBreadCrumbs from "@/components/custom/BreadCrumb/CommonBreadCrumb";
 import { useGetTicketsQuery } from "@/hooks/useQuerys/tickets/ticketsQuery";
 import { useDebounce } from "@uidotdev/usehooks";
+import CustomModalRenderer from "@/components/custom/ModalRenderer/CustomModalRenderer";
+import useCustomModalRenderer from "@/components/custom/ModalRenderer/useCustomModalRenderer";
+import TicketForm from "./modals/CreateTicket/CreateTicketModal";
 
 const ManageTickets = () => {
   const [pageSize, setPageSize] = useState(20);
   const [pageNo, setPageNo] = useState(1);
   const [searchText, setSearchText] = useState("");
-  const [status, setStatus] = useState<any>({ label: "All", value: "" });
-  const [channel, setChannel] = useState<any>({ label: "All", value: "" });
+  const [filterers, setFilterers] = useState<any>({
+    status: { label: "All", value: "" },
+    channel: { label: "All", value: "" },
+  });
 
-  const filters = useDebounce({
-    page: pageNo,
-    count: pageSize,
-    search_text: searchText,
-    channel: channel?.value,
-    status: status?.value,
-  },500)
+  const { activeTypes, pop, push } = useCustomModalRenderer(["createTicket"]);
 
-  const {data:ticketsData,isPending: loading,refetch:getAllTicketsCall } = useGetTicketsQuery(filters);
+  const apiFilters = useMemo(() => {
+    return {
+      page: pageNo,
+      count: pageSize,
+      search_text: searchText,
+      channel: filterers?.channel?.value,
+      status: filterers?.status?.value,
+      from:'vendor'
+    };
+  }, [pageSize, pageNo, searchText, filterers]);
+
+  const filters = useDebounce(apiFilters, 500);
+
+  const { data: ticketsData, isFetching: loading } = useGetTicketsQuery(filters);
 
   // AntD Select options
   const statusOptions = [
@@ -40,25 +50,13 @@ const ManageTickets = () => {
   ];
 
   // forms
-  const [show, setShow] = useState(false);
-  const [selectedTicket, setSelectedTicket] = useState<any>(null);
-  const [selectedTicketId, setSelectedTicketId] = useState<any>(null);
 
   const handlePageChange = (page: any, pageSize: any) => {
-    setPageSize(page);
-    setPageNo(pageSize);
+    setPageSize(pageSize);
+    setPageNo(page);
   };
 
-  const handleCloseForm = useCallback(() => {
-    setShow(false);
-    setSelectedTicket(null);
-    setSelectedTicketId(null);
-  }, []);
-
-  const handleSuccess = useCallback(() => {
-    handleCloseForm();
-    getAllTicketsCall()
-  }, [handleCloseForm, getAllTicketsCall]);
+  console.log("page", pageNo, pageSize);
 
   const renderStatusBadge = (status: string) => {
     const baseClass = "text-white p-2 rounded-sm";
@@ -92,115 +90,94 @@ const ManageTickets = () => {
       key: "status",
       render: (ticket: any) => renderStatusBadge(ticket?.status),
     },
-    // {
-    //   label: "Edit",
-    //   key: "edit",
-    //   render: (ticket: any) => {
-    //     return (
-    //       <SecoundaryButton
-    //         onClick={() => {
-    //           setShow(true);
-    //           const { id, subject, description, status } = ticket;
-    //           setSelectedTicket({ subject, description, status });
-    //           setSelectedTicketId(id);
-    //         }}
-    //       >
-    //         Edit
-    //       </SecoundaryButton>
-    //     );
-    //   },
-    // },
   ];
 
+  const modals = useMemo(() => {
+    return [
+      {
+        type: "createTicket",
+        component: (
+          <TicketForm isEdit={false} onHide={() => pop("createTicket")} />
+        ),
+      },
+    ];
+  }, [pop]);
+
   return (
-    <ManageTicketsStyled>
-      <div className="freshbag-wrapper p-3">
-        <CommonBreadCrumbs
-          items={[
-            { name: "Home", link: "/" },
-            { name: "Tickets", link: "/tickets" },
-          ]}
+    <div className="freshbag-wrapper p-3">
+      <CommonBreadCrumbs
+        items={[
+          { name: "Home", link: "/" },
+          { name: "Tickets", link: "/tickets" },
+        ]}
+      />
+      <h1>Tickets ({ticketsData?.data.total ?? 0})</h1>
+
+      <Row className="mb-3 items-end">
+        <Col span={18}>
+          <div className="flex items-center gap-3">
+            <CommonSearchBox
+              onSearch={(value) => {
+                setSearchText(value);
+              }}
+              placeHolder="Search for ticket"
+              searchText={searchText}
+            />
+            <Select
+              allowClear
+              labelInValue
+              value={filterers.status}
+              placeholder="Select Status"
+              onChange={(val) =>
+                setFilterers((prev: any) => ({ ...prev, status: val }))
+              }
+              options={statusOptions}
+              className="delta-select select-filter"
+              style={{ minWidth: 150 }}
+            />
+            <Select
+              allowClear
+              labelInValue
+              value={filterers.channel}
+              placeholder="Select Channel"
+              onChange={(val) =>
+                setFilterers((prev: any) => ({ ...prev, channel: val }))
+              }
+              options={channelOptions}
+              className="delta-select select-filter"
+              style={{ minWidth: 150 }}
+            />
+          </div>
+        </Col>
+        <Col span={6}>
+          <div className=" flex justify-end">
+            <PrimaryButton
+              onClick={() => {
+                push("createTicket");
+              }}
+              className="py-2"
+            >
+              Create Ticket
+            </PrimaryButton>
+          </div>
+        </Col>
+      </Row>
+      <div>
+        <CustomTable
+          data={ticketsData?.data.tickets ?? []}
+          columns={columns}
+          showingName="Tickets"
+          isLoading={loading}
+          onPageChange={handlePageChange}
+          page={pageNo}
+          pageSize={pageSize}
+          total={ticketsData?.data.total ?? 0}
+          pagination={true}
         />
-        <h1>Tickets ({ticketsData?.data.total ?? 0})</h1>
-        <div className="d-flex align-items-center mb-2">
-          <CommonSearchBox
-            onSearch={(value) => {
-              setSearchText(value);
-            }}
-            placeHolder="Search for ticket"
-            searchText={searchText}
-          />
-        </div>
-
-        <Row className="mb-3 items-end">
-          <Col md={9}>
-            <div className="flex items-center gap-3">
-              <Form.Group className="delta-signup-md" controlId="email">
-                <Form.Label className="text-sm mb-0"> Status</Form.Label>
-                <Select
-                  allowClear
-                  labelInValue
-                  value={status}
-                  placeholder="Select Status"
-                  onChange={(val) => setStatus(val)}
-                  options={statusOptions}
-                  className="delta-select select-filter"
-                  style={{ minWidth: 150 }}
-                />
-              </Form.Group>
-              <Form.Group className="delta-signup-md" controlId="email">
-                <Form.Label className="text-sm mb-0"> Channel</Form.Label>
-                <Select
-                  allowClear
-                  labelInValue
-                  value={channel}
-                  placeholder="Select Channel"
-                  onChange={(val) => setChannel(val)}
-                  options={channelOptions}
-                  className="delta-select select-filter"
-                  style={{ minWidth: 150 }}
-                />
-              </Form.Group>
-            </div>
-          </Col>
-          <Col md={3}>
-            <div className=" flex justify-end">
-              <PrimaryButton
-                onClick={() => {
-                  setShow(true);
-                }}
-                className="py-2"
-              >
-                Create Ticket
-              </PrimaryButton>
-            </div>
-          </Col>
-        </Row>
-        <div>
-          <CustomTable
-            data={ticketsData?.data.tickets ?? []}
-            columns={columns}
-            showingName="Tickets"
-            isLoading={loading}
-            onPageChange={handlePageChange}
-            page={pageNo}
-            pageSize={pageSize}
-            total={ticketsData?.data.total ?? 0}
-            pagination={true}
-          />
-        </div>
-
-        {/* {show && (
-          <TicketForm
-            onHide={handleCloseForm}
-            onSuccess={handleSuccess}
-            isEdit={selectedTicketId ? true : false}
-            selectedId={selectedTicketId}
-            defaultData={selectedTicket}
-          />
-        )} */}
       </div>
-    </ManageTicketsStyled>
+
+      <CustomModalRenderer activeTypes={activeTypes} modals={modals} />
+    </div>
   );
 };
 

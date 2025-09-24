@@ -11,6 +11,7 @@ import CalendarPage from "@/pages/Calender/Calendar";
 import Leads from "@/pages/Leads/Leads";
 import ManageRfq from "@/pages/ManageRfq/ManageRfq";
 import ManageTickets from "@/pages/ManageTickets/ManageTickets";
+import DashboardProfile from "@/pages/Dashboard/DashboardProfile";
 
 const router = createBrowserRouter([
   {
@@ -22,7 +23,13 @@ const router = createBrowserRouter([
         children: [
           {
             element: <ProtectedAfterLogin />,
-            children: [{ path: "/signin", element: <SignInPage /> }],
+            children: [
+              {
+                path: "/signin",
+                element: <SignInPage />,
+                id: "signin",
+              },
+            ],
           },
           {
             element: <ProtectedBeforeLogin />,
@@ -31,33 +38,39 @@ const router = createBrowserRouter([
               {
                 path: "/dashboard",
                 element: <HealthcareVendorSystem />,
-                handle: {
-                  layout: "x",
-                },
+                id: "dashboard",
+              },
+              {
+                path: "/dashboard/profile",
+                element: <DashboardProfile />,
+                id: "dashboardProfile",
               },
               {
                 path: "/bookings/:status?",
                 element: <Booking />,
+                id: "bookings",
               },
 
               {
-                path:"/leads",
-                element:<Leads/>
+                path: "/leads",
+                element: <Leads />,
+                id: "leads",
               },
 
               {
-                path:"/tickets",
-                element:<ManageTickets/>
+                path: "/tickets",
+                element: <ManageTickets />,
+                id: "tickets",
               },
 
               {
-                path:"/rfq",
-                element:<ManageRfq/>
+                path: "/rfq",
+                element: <ManageRfq />,
+                id: "rfq",
               },
 
-              { path: "/calendar", element: <CalendarPage /> },
+              { path: "/calendar", element: <CalendarPage />, id: "calendar" },
 
-              
               { path: "*", element: <RouteNotFound /> },
             ],
           },

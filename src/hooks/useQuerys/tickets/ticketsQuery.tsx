@@ -8,7 +8,7 @@ export const useGetTicketsQuery = (
   queryParams: getAllTicketsBody["filters"]
 ) => {
   const ticketsQuery = useQuery<TicketsResponse,TicketsErrorResponse>({
-    queryKey: ["tickets", queryParams],
+    queryKey: ["tickets", "getAllTickets" ,queryParams],
     queryFn: ({ signal }) =>{
         const body = Object.fromEntries(
           Object.entries(queryParams).filter(
@@ -20,6 +20,7 @@ export const useGetTicketsQuery = (
     enabled: !!queryParams,
     staleTime: 2000,
     retry: false,
+    placeholderData: (prev) => prev,
   });
 
   useEffect(()=>{
