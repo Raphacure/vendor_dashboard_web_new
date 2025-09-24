@@ -327,10 +327,7 @@ const Booking = () => {
               <RiDownloadLine size={20} />
             </button>
             {showDownloadPopup && (
-              <DownloadForm
-                sectionType="bookings"
-                closeForm={() => setShowDownloadPopup(false)}
-              />
+              <DownloadForm sectionType="bookings" sessionName="bookings" />
             )}
             <button
               className="filter"
@@ -561,18 +558,7 @@ const Booking = () => {
             )}
           </div>
           <div className="pd-container">
-            <button
-              className="download-btn"
-              onClick={() => setShowDownloadPopup(true)}
-            >
-              <RiDownloadLine size={20} />
-            </button>
-            {showDownloadPopup && (
-              <DownloadForm
-                sectionType="bookings"
-                closeForm={() => setShowDownloadPopup(false)}
-              />
-            )}
+            <DownloadForm sectionType="bookings" sessionName="bookings" />
           </div>
         </div>
         <div>

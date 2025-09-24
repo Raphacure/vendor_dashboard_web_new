@@ -23,13 +23,13 @@ const useMediaQuery = (query: string): boolean => {
 };
 
 const DateRender = (props: {
-  bookings: Array<any>;
+  bookings?: Array<any>;
   current: Dayjs;
   loading: boolean;
   handleShowMore: (data: any) => void;
   mode: string;
   handleBookingDetailsModalOpen: (booking: any) => void;
-  leaves: Array<any>;
+  leaves?: Array<any>;
 }) => {
   const {
     bookings,
@@ -51,10 +51,15 @@ const DateRender = (props: {
   );
 
   const bgColor = (() => {
-    if (leaves?.length > 0 && mode === "month") {
-      return "bg-[#F3E1EA]";
-    } else if (bookings?.length > 0) {
-      return "bg-[#e9f2fd]";
+    if (leaves) {
+      if (leaves?.length > 0 && mode === "month") {
+        return "bg-[#F3E1EA]";
+      }
+    }
+    if (bookings) {
+      if (bookings?.length > 0) {
+        return "bg-[#e9f2fd]";
+      }
     }
     return "";
   })();
@@ -90,8 +95,8 @@ const DateRender = (props: {
     return (
       <div
         className={`mobile-date-cell ${
-          leaves?.length > 0 ? "has-leaves" : ""
-        } ${bookings?.length > 0 ? "has-bookings" : ""}`}
+          leaves && leaves?.length > 0 ? "has-leaves" : ""
+        } ${bookings && bookings?.length > 0 ? "has-bookings" : ""}`}
       >
         <div className={`date-indicator ${isToday ? "current-date" : ""}`}>
           {current.date()}
@@ -130,13 +135,13 @@ const DateRender = (props: {
           ))} */}
 
           {/* {(bookings?.length > 2 || leaves?.length > 1) && ( */}
-          {(bookings?.length > 2) && (
+          {bookings && bookings?.length > 2 && (
             <div
               onClick={(e) => {
                 e.stopPropagation();
                 handleShowMore({
                   data: { bookings, leaves },
-                  type: leaves?.length > 0 ? "leave" : "booking",
+                  type: leaves && leaves?.length > 0 ? "leave" : "booking",
                   title: current.format("DD MMMM YYYY"),
                   position: {
                     top: `${e.currentTarget.getBoundingClientRect().top}`,
@@ -164,7 +169,7 @@ const DateRender = (props: {
           {mode === "year" ? current.format("MMMM") : current.date()}
         </div>
       </div>
-      {leaves?.length > 0 && mode === "month" ? (
+      {leaves && leaves?.length > 0 && mode === "month" ? (
         <>
           <div className="flex justify-around items-center h-full flex-col">
             <img
@@ -177,7 +182,7 @@ const DateRender = (props: {
         </>
       ) : (
         <>
-          {bookings?.length > 0 ? (
+          {bookings && bookings?.length > 0 ? (
             <div
               ref={containerRef}
               className="w-full grow-1 px-2 py-1 overflow-hidden"
@@ -228,7 +233,7 @@ const DateRender = (props: {
           ) : (
             <div>No bookings</div>
           )}
-          {leaves?.length > 0 && mode === "year" && (
+          {leaves && leaves?.length > 0 && mode === "year" && (
             <div
               ref={containerRef}
               className="w-full grow-1 px-2 py-1 overflow-hidden"

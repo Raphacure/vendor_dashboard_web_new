@@ -1,5 +1,5 @@
 import App from "@/App";
-import { BrowserRouter, Route, Routes } from "react-router";
+import { createBrowserRouter, RouterProvider } from "react-router";
 import SignInPage from "@/pages/Signin/SignInPage";
 import { ProtectedAfterLogin, ProtectedBeforeLogin } from "./ProtectedRoutes";
 import SuspenceBoundary from "./SuspenceBoundary";
@@ -8,33 +8,80 @@ import Booking from "@/pages/Bookings/Booking";
 import RouteNotFound from "@/components/Errors/RouteNotFound/RouteNotFound";
 import HealthcareVendorSystem from "@/pages/Dashboard/Dashboard";
 import CalendarPage from "@/pages/Calender/Calendar";
+import Leads from "@/pages/Leads/Leads";
+import ManageRfq from "@/pages/ManageRfq/ManageRfq";
+import ManageTickets from "@/pages/ManageTickets/ManageTickets";
+import DashboardProfile from "@/pages/Dashboard/DashboardProfile";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <MainLayout />,
+    children: [
+      {
+        element: <SuspenceBoundary />,
+        children: [
+          {
+            element: <ProtectedAfterLogin />,
+            children: [
+              {
+                path: "/signin",
+                element: <SignInPage />,
+                id: "signin",
+              },
+            ],
+          },
+          {
+            element: <ProtectedBeforeLogin />,
+            children: [
+              { path: "/", element: <App /> },
+              {
+                path: "/dashboard",
+                element: <HealthcareVendorSystem />,
+                id: "dashboard",
+              },
+              {
+                path: "/dashboard/profile",
+                element: <DashboardProfile />,
+                id: "dashboardProfile",
+              },
+              {
+                path: "/bookings/:status?",
+                element: <Booking />,
+                id: "bookings",
+              },
+
+              {
+                path: "/leads",
+                element: <Leads />,
+                id: "leads",
+              },
+
+              {
+                path: "/tickets",
+                element: <ManageTickets />,
+                id: "tickets",
+              },
+
+              {
+                path: "/rfq",
+                element: <ManageRfq />,
+                id: "rfq",
+              },
+
+              { path: "/calendar", element: <CalendarPage />, id: "calendar" },
+
+              { path: "*", element: <RouteNotFound /> },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+]);
 
 const MainWrapper = () => {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route element={<MainLayout />}>
-          <Route element={<SuspenceBoundary />}>
-            <Route element={<ProtectedAfterLogin />}>
-              <Route path="/signin" element={<SignInPage />} />
-            </Route>
-
-            <Route element={<ProtectedBeforeLogin />}>
-              <Route path="/" element={<App />} />
-              <Route path="/dashboard" element={<HealthcareVendorSystem />} />
-
-              <Route path="/bookings/:status?" element={<Booking />} />
-              
-              {/* <Route path="/calender" element={<CalendarPage />} /> */}
-
-              <Route path="*" element={<RouteNotFound/>} />
-            </Route>
-
-          </Route>
-        </Route>
-      </Routes>
-    </BrowserRouter>
-  );
+  return <RouterProvider router={router} />;
 };
 
 export default MainWrapper;

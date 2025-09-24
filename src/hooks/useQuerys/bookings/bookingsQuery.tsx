@@ -19,6 +19,7 @@ export const useGetBookings = (
     enabled: !!queryParams.id,
     staleTime: 2000,
     retry: false,
+    placeholderData: (prev) => prev,
   });
 
   useEffect(() => {

@@ -1,16 +1,18 @@
 import styled from "styled-components";
 
 export const DownloadFormStyled = styled.div`
-  position: fixed;
-  top: 30%;
-  right: 4%;
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  width: 400px;
-  font-family: inter;
+  .download-container {
+    position: fixed;
+    top: 30%;
+    right: 4%;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    width: 400px;
+    font-family: inter;
+  }
 
   .download {
     display: flex;
@@ -136,8 +138,10 @@ export const DownloadFormStyled = styled.div`
   }
 
   @media (max-width: 675px) {
-    right: 50%;
-    left: 50%;
-    transform: translate(-50%, 0);
+    .download-container {
+      right: 50%;
+      left: 50%;
+      transform: translate(-50%, 0);
+    }
   }
 `;

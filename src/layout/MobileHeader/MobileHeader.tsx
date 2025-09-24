@@ -1,30 +1,20 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { IoArrowBack, IoSearchOutline, IoClose } from "react-icons/io5";
 import { useNavigate, useLocation } from "react-router";
 import RaphaPlusCommonSearch from "../../components/CommonSearch/CommonSearch";
 import BubbleLoader from "../../components/loader/bubbleLoader/BubbleLoader";
-import { getCurrentRoute, getName } from "@/lib/common";
-import { locationsDetails } from "../Layout.constants";
+import { getName } from "@/lib/common";
 import { DashBoardHeaderStyled, HeaderStyled } from "./MobileHeader.styled";
+import { useRouteLayout } from "../Layout.constants";
+import useVendorDetails from "@/hooks/auth/useVendorDetails";
 
 const MobileHeader = () => {
   const navigate = useNavigate();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const location = useLocation();
   const searchTerm = new URLSearchParams(location.search).get("clinic_search");
-  const { clientDetails, loading, linkableId } = {};
-  const currentPathKey =
-    getCurrentRoute(
-      locationsDetails.map((item) => ({ path: item.path, key: item.name })),
-      location.pathname
-    ) ?? "Dashboard";
 
-  const matchedLocation = useMemo(
-    () => locationsDetails.find((item) => item.name === currentPathKey),
-    [currentPathKey]
-  );
-
-  const isDashboardHeader = Boolean(location.state?.render?.dashboardHeader);
+  const layout = useRouteLayout();
 
   useEffect(() => {
     if (searchTerm) {
@@ -32,20 +22,7 @@ const MobileHeader = () => {
     }
   }, [searchTerm]);
 
-  const formatRouteToTitle = (route: string) => {
-    if (!route) return "";
-    return route
-      .split("-")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
-  };
-
-  const getHeaderTitle = () => {
-    if (matchedLocation?.name) {
-      return formatRouteToTitle(matchedLocation.name);
-    }
-    return "Dashboard";
-  };
+  const {vendorDetails,loading,linkableId} = useVendorDetails()
 
   const handleSearchData = (payload: any) => {
     const searchResult = payload?.data?.bookings?.map((item: any) => {
@@ -59,7 +36,7 @@ const MobileHeader = () => {
     return searchResult;
   };
 
-  if (isDashboardHeader) {
+  if (layout?.render?.dashboardHeader) {
     return (
       <DashBoardHeaderStyled>
         <div className="main-div">
@@ -75,10 +52,10 @@ const MobileHeader = () => {
               }
             >
               <span className="doc-img">
-                {clientDetails?.logo_url && (
+                {vendorDetails?.image && (
                   <img
                     className="img-size"
-                    src={clientDetails?.logo_url}
+                    src={vendorDetails?.image}
                     alt=""
                   />
                 )}
@@ -90,7 +67,7 @@ const MobileHeader = () => {
                   ) : (
                     <>
                       <p className="mb-1 font-inter font-semibold text-[20px] leading-[100%] tracking-[0%] align-middle">
-                        {`${clientDetails?.name ?? "client name not found"}`}
+                        {`${vendorDetails?.name ?? "client name not found"}`}
                       </p>
                     </>
                   )}
@@ -190,11 +167,10 @@ const MobileHeader = () => {
           <button className="icon-button" onClick={() => navigate(-1)}>
             <IoArrowBack size={24} color="#003366" />
           </button>
-          <h1 className="title">{getHeaderTitle()}</h1>
+          <h1 className="title">{layout?.title}</h1>
         </div>
         {!(
-          location?.state?.noRender?.search ??
-          matchedLocation?.state?.noRender?.search
+          layout?.noRender?.search 
         ) &&
           !searchTerm &&
           linkableId && (
@@ -213,8 +189,7 @@ const MobileHeader = () => {
       {(isSearchOpen || searchTerm) &&
         linkableId &&
         !(
-          location?.state?.noRender?.search ??
-          matchedLocation?.state?.noRender?.search
+          layout?.noRender?.search 
         ) && (
           <div className="search-container-old">
             <RaphaPlusCommonSearch

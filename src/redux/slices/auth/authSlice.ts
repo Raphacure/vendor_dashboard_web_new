@@ -6,7 +6,6 @@ import {
   LoginResponseApi,
   User,
   VendorApiResponse,
-  VendorErrorResponse,
 } from "@/Scenes/apis/auth/authAPI.types";
 
 export interface AuthState {

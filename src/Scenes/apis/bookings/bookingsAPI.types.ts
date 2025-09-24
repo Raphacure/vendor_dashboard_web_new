@@ -11,7 +11,7 @@ export interface BookingQueryParams {
   pageSize: number;
   status: string;
   id: string;
-  searchText: string;
+  searchText?: string;
 }
 
 export type GetBookingsApiResponse = {

@@ -7,14 +7,13 @@ import PrimaryButton from "@/components/custom/button/PrimaryButton";
 import { SERVER_IP } from "@/lib/config";
 import toast from "react-hot-toast";
 import { utils } from "xlsx";
-import { useDispatch } from "react-redux";
 import useVendorLinkableId from "@/hooks/auth/useVendorLinkableId";
 import { getToken } from "@/lib/helpers";
+import { RiDownloadLine } from "react-icons/ri";
 
 interface DownloadFormProps {
-  closeForm: () => void;
-  sectionType: "bookings" | "orders";
-  dateFilter?: boolean;
+  sectionType: "bookings" | "orders" | "leads";
+  sessionName: string;
 }
 
 interface Duration {
@@ -31,11 +30,17 @@ interface TypeConfig {
     | { handleDownload: () => Promise<any>; url?: never; body?: never };
 }
 
+interface DownloadFormConfig {
+  type: TypeConfig;
+}
+
 const DownloadForm: React.FC<DownloadFormProps> = ({
-  closeForm,
   sectionType,
+  sessionName,
 }) => {
+
   const { linkableId } = useVendorLinkableId();
+  const [showDownloadPopup, setShowDownloadPopup] = useState(false);
   const [selectedDuration, setSelectedDuration] = useState<Duration | null>({
     name: "1 Week",
     duration: {
@@ -48,27 +53,43 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
   );
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const type: TypeConfig = {
-    bookings: {
-      url: "/api/v1/booking/download-bookings",
-      body: {
-        filters: {
-          from: "hr",
-          clientId: linkableId,
-          dateRange: {
-            from: selectedDuration?.duration?.startDate?.(),
-            to: selectedDuration?.duration?.endDate?.(),
-            dateType: dateType,
+  const defaultDownloadFormConfig: DownloadFormConfig = {
+    type: {
+      bookings: {
+        url: "/api/v1/booking/download-bookings",
+        body: {
+          filters: {
+            from: "hr",
+            clientId: "", // This will be replaced by useVendorLinkableId
+            dateRange: {
+              from: "",
+              to: "",
+              dateType: "scheduled",
+            },
+          },
+        },
+      },
+      orders: {
+        handleDownload: async () => {},
+      },
+      leads: {
+        url: "/api/v1/lead/download-leads",
+        body: {
+          filters: {
+            from: "hr",
+            clientId: "", // This will be replaced by useVendorLinkableId
+            dateRange: {
+              from: "",
+              to: "",
+              dateType: "scheduled",
+            },
           },
         },
       },
     },
-    orders: {
-      handleDownload: async () => {
-
-      },
-    },
   };
+
+  const type = defaultDownloadFormConfig.type;
 
   const durations: Duration[] = [
     {
@@ -145,7 +166,7 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
       const typeConfig = type[sectionType];
 
       if (!typeConfig) {
-        toast.error(`${sectionType} feature not implemented`);
+        toast.error(`${sessionName} feature not implemented`);
         return;
       }
 
@@ -161,9 +182,23 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
         typeConfig.url &&
         typeConfig.body
       ) {
+        const updatedBody = {
+          ...typeConfig.body,
+          filters: {
+            ...typeConfig.body.filters,
+            clientId: linkableId,
+            dateRange: {
+              ...typeConfig.body.filters.dateRange,
+              from: selectedDuration?.duration?.startDate?.(),
+              to: selectedDuration?.duration?.endDate?.(),
+              dateType: dateType,
+            },
+          },
+        };
+
         const response = await fetch(`${SERVER_IP}${typeConfig.url}`, {
           method: "POST",
-          body: JSON.stringify(typeConfig.body),
+          body: JSON.stringify(updatedBody),
           headers: {
             Accept: "text/csv",
             "Content-Type": "application/json",
@@ -175,7 +210,7 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = "data.csv"; // Set file name
+        a.download = `${sessionName}.csv`; // Set file name dynamically
         document.body.appendChild(a);
         a.click();
 
@@ -196,161 +231,175 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
   console.log(selectedDuration);
   return (
     <DownloadFormStyled>
-      <div className="download">
-        <div className="download-header">
-          <h3>Choose Duration</h3>
-          <button
-            className="close-btn"
-            disabled={isDownloading}
-            onClick={closeForm}
-          >
-            <MdCancel size={22} />
-          </button>
-        </div>
+      <button
+        className="download-btn"
+        onClick={() => setShowDownloadPopup(true)}
+      >
+        <RiDownloadLine size={20} />
+      </button>
+      {showDownloadPopup && (
+        <div className="download-container">
+          <div className="download">
+            <div className="download-header">
+              <h3>Choose Duration</h3>
+              <button
+                className="close-btn"
+                disabled={isDownloading}
+                onClick={() => {
+                  setShowDownloadPopup(false);
+                  setSelectedDuration(null);
+                }}
+              >
+                <MdCancel size={22} />
+              </button>
+            </div>
 
-        <div className="options">
-          {durations.map((duration) => (
-            <label key={duration?.name} className="checkbox-label">
-              <input
-                type="checkbox"
-                checked={selectedDuration?.name === duration?.name}
-                onChange={() => handleCheckboxChange(duration)}
-              />
-              {duration?.name}
-            </label>
-          ))}
-        </div>
+            <div className="options">
+              {durations.map((duration) => (
+                <label key={duration?.name} className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={selectedDuration?.name === duration?.name}
+                    onChange={() => handleCheckboxChange(duration)}
+                  />
+                  {duration?.name}
+                </label>
+              ))}
+            </div>
 
-        <div className="or">
-          <p>OR</p>
-        </div>
+            <div className="or">
+              <p>OR</p>
+            </div>
 
-        <div className="custom-date">
-          <label className="checkbox-label">
-            <input
-              type="checkbox"
-              checked={selectedDuration?.name === "custom date"}
-              onChange={() =>
-                setSelectedDuration((prev) => {
-                  if (prev?.name === "custom date") {
-                    return null;
-                  } else {
-                    return {
-                      name: "custom date",
-                      duration: { startDate: null, endDate: null },
-                    };
+            <div className="custom-date">
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={selectedDuration?.name === "custom date"}
+                  onChange={() =>
+                    setSelectedDuration((prev) => {
+                      if (prev?.name === "custom date") {
+                        return null;
+                      } else {
+                        return {
+                          name: "custom date",
+                          duration: { startDate: null, endDate: null },
+                        };
+                      }
+                    })
                   }
-                })
+                />
+                Customize Date
+              </label>
+            </div>
+
+            <div className="sort-by-radio">
+              <p>Sort by</p>
+              <label>
+                <input
+                  type="radio"
+                  value="scheduled"
+                  checked={dateType === "scheduled"}
+                  onChange={() => setDateType("scheduled")}
+                />
+                Scheduled
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  value="created"
+                  checked={dateType === "created"}
+                  onChange={() => setDateType("created")}
+                />
+                Created
+              </label>
+            </div>
+
+            {/* --- Start: Refactored Section with Ant Design --- */}
+            {selectedDuration?.name === "custom date" && (
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item label="Start Date">
+                    <DatePicker
+                      style={{ width: "100%" }}
+                      placeholder="Start Date"
+                      disabledDate={(current) =>
+                        current && current > moment().endOf("day")
+                      }
+                      onChange={(date, dateString) => {
+                        if (!dateString) return;
+                        const selectedStartDate = () =>
+                          moment(dateString).format("YYYY-MM-DD");
+                        setSelectedDuration((prev) => {
+                          if (!prev) return null;
+                          return {
+                            ...prev,
+                            duration: {
+                              ...prev.duration,
+                              startDate: selectedStartDate,
+                              endDate:
+                                prev.duration.endDate &&
+                                prev.duration.endDate() < selectedStartDate()
+                                  ? selectedStartDate
+                                  : prev.duration.endDate,
+                            },
+                          };
+                        });
+                      }}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label="End Date">
+                    <DatePicker
+                      style={{ width: "100%" }}
+                      placeholder="End Date"
+                      disabledDate={(current) => {
+                        const startDate =
+                          selectedDuration?.duration?.startDate?.();
+                        const isAfterToday =
+                          current && current > moment().endOf("day");
+                        const isBeforeStartDate =
+                          startDate &&
+                          current &&
+                          current < moment(startDate).startOf("day");
+                        return !!(isAfterToday || isBeforeStartDate);
+                      }}
+                      onChange={(date, dateString) => {
+                        if (!dateString) return;
+                        const selectedEndDate = () =>
+                          moment(dateString).format("YYYY-MM-DD");
+                        setSelectedDuration((prev) => {
+                          if (!prev) return null;
+                          return {
+                            ...prev,
+                            duration: {
+                              ...prev.duration,
+                              endDate: selectedEndDate,
+                            },
+                          };
+                        });
+                      }}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+            )}
+            {/* --- End: Refactored Section --- */}
+
+            <PrimaryButton
+              onClick={onDownloadExcell}
+              disabled={
+                !selectedDuration?.duration?.startDate ||
+                !selectedDuration?.duration?.endDate ||
+                isDownloading
               }
-            />
-            Customize Date
-          </label>
+            >
+              Download Excel
+            </PrimaryButton>
+          </div>
         </div>
-
-        <div className="sort-by-radio">
-          <p>Sort by</p>
-          <label>
-            <input
-              type="radio"
-              value="scheduled"
-              checked={dateType === "scheduled"}
-              onChange={() => setDateType("scheduled")}
-            />
-            Scheduled
-          </label>
-          <label>
-            <input
-              type="radio"
-              value="created"
-              checked={dateType === "created"}
-              onChange={() => setDateType("created")}
-            />
-            Created
-          </label>
-        </div>
-        
-        {/* --- Start: Refactored Section with Ant Design --- */}
-        {selectedDuration?.name === "custom date" && (
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item label="Start Date">
-                <DatePicker
-                  style={{ width: "100%" }}
-                  placeholder="Start Date"
-                  disabledDate={(current) =>
-                    current && current > moment().endOf("day")
-                  }
-                  onChange={(date, dateString) => {
-                    if (!dateString) return;
-                    const selectedStartDate = () =>
-                      moment(dateString).format("YYYY-MM-DD");
-                    setSelectedDuration((prev) => {
-                      if (!prev) return null;
-                      return {
-                        ...prev,
-                        duration: {
-                          ...prev.duration,
-                          startDate: selectedStartDate,
-                          endDate:
-                            prev.duration.endDate &&
-                            prev.duration.endDate() < selectedStartDate()
-                              ? selectedStartDate
-                              : prev.duration.endDate,
-                        },
-                      };
-                    });
-                  }}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item label="End Date">
-                <DatePicker
-                  style={{ width: "100%" }}
-                  placeholder="End Date"
-                  disabledDate={(current) => {
-                    const startDate = selectedDuration?.duration?.startDate?.();
-                    const isAfterToday =
-                      current && current > moment().endOf("day");
-                    const isBeforeStartDate =
-                      startDate &&
-                      current &&
-                      current < moment(startDate).startOf("day");
-                    return !!(isAfterToday || isBeforeStartDate);
-                  }}
-                  onChange={(date, dateString) => {
-                    if (!dateString) return;
-                    const selectedEndDate = () =>
-                      moment(dateString).format("YYYY-MM-DD");
-                    setSelectedDuration((prev) => {
-                      if (!prev) return null;
-                      return {
-                        ...prev,
-                        duration: {
-                          ...prev.duration,
-                          endDate: selectedEndDate,
-                        },
-                      };
-                    });
-                  }}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-        )}
-        {/* --- End: Refactored Section --- */}
-
-        <PrimaryButton
-          onClick={onDownloadExcell}
-          disabled={
-            !selectedDuration?.duration?.startDate ||
-            !selectedDuration?.duration?.endDate ||
-            isDownloading
-          }
-        >
-          Download Excel
-        </PrimaryButton>
-      </div>
+      )}
     </DownloadFormStyled>
   );
 };

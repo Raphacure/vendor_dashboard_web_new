@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const SidebarStyled = styled.div`
   max-height: calc(100vh - 89px);
   height: 100%;
-  
+
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   will-change: scroll-position;
@@ -11,8 +11,8 @@ export const SidebarStyled = styled.div`
   &::-webkit-scrollbar {
     display: none;
   }
-  -ms-overflow-style: none; 
-  scrollbar-width: none; 
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 
   .sidebar-main {
     width: 100px;
@@ -38,18 +38,19 @@ export const SidebarStyled = styled.div`
 
     &:hover {
       width: 250px;
-      
+
+      .submenu-container.active {
+        transition-delay: 0.1s;
+        max-height: 500px;
+        opacity: 1;
+      }
+
       .menu-item span,
       .logout span {
         display: inline;
         opacity: 1;
         transform: translateX(0);
         transition-delay: 0.05s;
-      }
-
-      .submenu-container {
-        max-height: 300px;
-        opacity: 1;
       }
 
       .chevron-icon {
@@ -78,6 +79,15 @@ export const SidebarStyled = styled.div`
     will-change: transform, height;
   }
 
+  .main-menu-div {
+    &:hover {
+      .submenu-container {
+        transition-delay: 0.3s;
+        max-height: 500px;
+        opacity: 1;
+      }
+    }
+  }
 
   .menu-item {
     display: flex;
@@ -97,65 +107,31 @@ export const SidebarStyled = styled.div`
       transform: translateX(2px);
     }
 
-    &.has-sub-menu:hover .submenu-container {
-      max-height: 300px;
-      opacity: 1;
-      padding: 8px 0;
-    }
-
     &.has-sub-menu:hover .chevron-icon {
       transform: rotate(90deg);
     }
   }
 
   .submenu-container {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: rgba(248, 249, 250, 0.98);
-    backdrop-filter: blur(10px);
-    border-radius: 0 0 12px 12px;
     max-height: 0;
-    opacity: 0;
     overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 10;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    border-top: none;
-  }
-
-  .submenu-divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1), transparent);
-    margin: 4px 12px;
+    opacity: 0;
+    transition: all .4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .submenu-item {
     display: grid;
     align-items: center;
-    grid-template-columns: 24px 1fr; 
+    grid-template-columns: 24px 1fr;
     gap: 15px;
-    padding: 8px 15px 8px 45px;
+    padding: 8px 15px 8px 30px;
     cursor: pointer;
     font-size: 14px;
     color: rgba(0, 0, 0, 0.7);
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    border-left: 3px solid transparent;
 
-    &:hover {
-      background-color: rgba(37, 43, 97, 0.1);
-      color: #252b61;
-      border-left-color: #252b61;
-      transform: translateX(3px);
-    }
-
-    &.active {
-      background-color: rgba(37, 43, 97, 0.15);
-      color: #252b61;
+    &.active{
       font-weight: 600;
-      border-left-color: #252b61;
     }
   }
 
@@ -193,7 +169,6 @@ export const SidebarStyled = styled.div`
     transform: scale(1.1);
   }
 
-
   .bottom-section {
     display: flex;
     flex-direction: column;
@@ -215,13 +190,16 @@ export const SidebarStyled = styled.div`
     position: relative;
 
     &:hover {
-      background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(239, 68, 68, 0.1));
+      background: linear-gradient(
+        135deg,
+        rgba(220, 38, 38, 0.1),
+        rgba(239, 68, 68, 0.1)
+      );
     }
 
     .logo {
       transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-
   }
 
   .help-center-container {
@@ -235,7 +213,6 @@ export const SidebarStyled = styled.div`
     width: 100%;
     height: 120px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
   }
 
   .help-center-icon {
@@ -305,7 +282,7 @@ export const SidebarStyled = styled.div`
   @media (max-width: 768px) {
     .sidebar-main {
       width: 80px;
-      
+
       &:hover {
         width: 200px;
       }
