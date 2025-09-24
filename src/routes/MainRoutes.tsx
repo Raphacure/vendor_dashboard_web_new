@@ -1,24 +1,24 @@
-import App from "@/App";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import { ProtectedAfterLogin, ProtectedBeforeLogin } from "./ProtectedRoutes";
 import SuspenceBoundary from "./SuspenceBoundary";
 import MainLayout from "@/layout/MainLayout";
 import { lazy } from "react";
 
+const App = lazy(() => import("@/App"));
 const SignInPage = lazy(() => import("@/pages/Signin/SignInPage"));
 const Booking = lazy(() => import("@/pages/Bookings/Booking"));
 const RouteNotFound = lazy(
-  () => import("@/components/Errors/RouteNotFound/RouteNotFound"),
+  () => import("@/components/Errors/RouteNotFound/RouteNotFound")
 );
 const HealthcareVendorSystem = lazy(
-  () => import("@/pages/Dashboard/Dashboard"),
+  () => import("@/pages/Dashboard/Dashboard")
 );
 const CalendarPage = lazy(() => import("@/pages/Calender/Calendar"));
 const Leads = lazy(() => import("@/pages/Leads/Leads"));
 const ManageRfq = lazy(() => import("@/pages/ManageRfq/ManageRfq"));
 const ManageTickets = lazy(() => import("@/pages/ManageTickets/ManageTickets"));
 const DashboardProfile = lazy(
-  () => import("@/pages/Dashboard/DashboardProfile"),
+  () => import("@/pages/Dashboard/DashboardProfile")
 );
 
 const router = createBrowserRouter([
