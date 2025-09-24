@@ -1,10 +1,10 @@
+import App from "@/App";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import { ProtectedAfterLogin, ProtectedBeforeLogin } from "./ProtectedRoutes";
 import SuspenceBoundary from "./SuspenceBoundary";
 import MainLayout from "@/layout/MainLayout";
 import { lazy } from "react";
 
-const App = lazy(() => import("@/App"));
 const SignInPage = lazy(() => import("@/pages/Signin/SignInPage"));
 const Booking = lazy(() => import("@/pages/Bookings/Booking"));
 const RouteNotFound = lazy(
