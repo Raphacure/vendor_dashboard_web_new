@@ -306,7 +306,7 @@ const Sidebar = () => {
                   } ${item?.hasSubMenu ? "has-sub-menu" : ""}`}
                   data-item={item.name}
                   ref={activeTab === item.name ? activeItemRef : null}
-                  onClick={() => handleItemClick(item)}
+                  onClick={() => !item?.hasSubMenu && handleItemClick(item)}
                 >
                   <img
                     src={activeTab === item.name ? item.whiteImg : item.img}
