@@ -2,7 +2,7 @@ import styled from "styled-components";
 import SecoundaryButton from "../button/SecoundaryButton";
 import { File } from "lucide-react";
 import CustomModal from "../modal/CustomModal/CustomModal";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 
 const RenderPreviewContent = ({
   previewFile,

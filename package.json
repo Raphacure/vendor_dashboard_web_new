@@ -59,7 +59,6 @@
     "react-router": "^7.3.0",
     "react-social-login": "^3.4.17",
     "react-switch": "^7.1.0",
-    "react-toastify": "^11.0.5",
     "recharts": "^2.15.1",
     "redux": "^5.0.1",
     "redux-persist": "^6.0.0",
