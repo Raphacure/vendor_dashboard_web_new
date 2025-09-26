@@ -14,58 +14,58 @@ interface MenuItem {
 }
 
 const categoryItems = [
-  {
-    name: "Orders",
-    img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/120521-1738068786395.png",
-    whiteImg:
-      "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/120521-1738090371408.png",
-    path: "/orders",
-    openInNewTab: false,
-    state: { name: "Orders" },
-    action(history: any) {
-      history(this.path, { state: this?.state });
-    },
-  },
-  {
-    name: "Quick Links",
-    img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/76907-1743505603326.png",
-    whiteImg:
-      "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/76907-1743505603326.png",
-    path: "/quick-links",
-    openInNewTab: false,
-  },
-  {
-    name: "Packages",
-    img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1757401687133.svg",
-    whiteImg:
-      "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1757401735668.svg",
-    path: "/packages",
-    openInNewTab: false,
-  },
-  {
-    name: "Data Analytics",
-    img: "	https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419857892.png",
-    whiteImg:
-      "	https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419877370.png",
-    path: "/data-analytics",
-    openInNewTab: false,
-  },
-  {
-    name: "My Employees",
-    img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/120521-1738068953762.png",
-    whiteImg:
-      "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/120521-1738090411933.png",
-    path: "/employees",
-    openInNewTab: false,
-  },
-  {
-    name: "Manage Users",
-    img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/106435-1743396573910.png",
-    whiteImg:
-      "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/106435-1743751876973.png",
-    path: "/manageUsers",
-    openInNewTab: false,
-  },
+  // {
+  //   name: "Orders",
+  //   img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/120521-1738068786395.png",
+  //   whiteImg:
+  //     "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/120521-1738090371408.png",
+  //   path: "/orders",
+  //   openInNewTab: false,
+  //   state: { name: "Orders" },
+  //   action(history: any) {
+  //     history(this.path, { state: this?.state });
+  //   },
+  // },
+  // {
+  //   name: "Quick Links",
+  //   img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/76907-1743505603326.png",
+  //   whiteImg:
+  //     "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/76907-1743505603326.png",
+  //   path: "/quick-links",
+  //   openInNewTab: false,
+  // },
+  // {
+  //   name: "Packages",
+  //   img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1757401687133.svg",
+  //   whiteImg:
+  //     "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1757401735668.svg",
+  //   path: "/packages",
+  //   openInNewTab: false,
+  // },
+  // {
+  //   name: "Data Analytics",
+  //   img: "	https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419857892.png",
+  //   whiteImg:
+  //     "	https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419877370.png",
+  //   path: "/data-analytics",
+  //   openInNewTab: false,
+  // },
+  // {
+  //   name: "My Employees",
+  //   img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/120521-1738068953762.png",
+  //   whiteImg:
+  //     "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/120521-1738090411933.png",
+  //   path: "/employees",
+  //   openInNewTab: false,
+  // },
+  // {
+  //   name: "Manage Users",
+  //   img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/106435-1743396573910.png",
+  //   whiteImg:
+  //     "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/106435-1743751876973.png",
+  //   path: "/manageUsers",
+  //   openInNewTab: false,
+  // },
   // {
   //   name: "Promotional Data",
   //   img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/120521-1738068786395.png",
@@ -74,14 +74,14 @@ const categoryItems = [
   //   path: "/promotional-data",
   //   openInNewTab: false,
   // },
-  {
-    name: "My Clients",
-    img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419622833.png",
-    whiteImg:
-      "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419698378.png",
-    path: "/MyClients",
-    openInNewTab: false,
-  },
+  // {
+  //   name: "My Clients",
+  //   img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419622833.png",
+  //   whiteImg:
+  //     "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419698378.png",
+  //   path: "/MyClients",
+  //   openInNewTab: false,
+  // },
   {
     name: "RFQ",
     img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419893082.png",
@@ -90,14 +90,14 @@ const categoryItems = [
     path: "/RFQ",
     openInNewTab: false,
   },
-  {
-    name: "Community",
-    img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419792542.png",
-    whiteImg:
-      "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419830326.png",
-    path: "/communities",
-    openInNewTab: false,
-  },
+  // {
+  //   name: "Community",
+  //   img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419792542.png",
+  //   whiteImg:
+  //     "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1750419830326.png",
+  //   path: "/communities",
+  //   openInNewTab: false,
+  // },
   // {
   //   name: "Communication  Map",
   //   img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/120521-1738068786395.png",
@@ -171,11 +171,11 @@ const menuItems: MenuItem[] = [
     },
   },
   {
-    name: "Employees",
+    name: "Leads",
     img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/31020-1754293567456.svg",
     whiteImg:
       "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/31020-1754293567456.svg",
-    path: "/employees",
+    path: "/leads",
     openInNewTab: false,
     action(history: any, instituteAction: any) {
       history(this.path, { state: this?.state });

@@ -74,21 +74,21 @@ const menuItems: MenuItem[] = [
   //   openInNewTab: false,
   // },
 
-  {
-    name: "Catalogue",
-    img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1757401687133.svg",
-    whiteImg:
-      "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1757401735668.svg",
-    path: "/packages",
-    openInNewTab: false,
-    hasSubMenu: true,
-    subMenuItems: [
-      {
-        name: "Manage RFQ",
-        path: "/manage-rfq",
-      },
-    ],
-  },
+  // {
+  //   name: "Catalogue",
+  //   img: "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1757401687133.svg",
+  //   whiteImg:
+  //     "https://raphacure-public-images.s3.ap-south-1.amazonaws.com/119535-1757401735668.svg",
+  //   path: "/packages",
+  //   openInNewTab: false,
+  //   hasSubMenu: true,
+  //   subMenuItems: [
+  //     {
+  //       name: "Manage RFQ",
+  //       path: "/manage-rfq",
+  //     },
+  //   ],
+  // },
 
   // {
   //   name: "My Employees",
