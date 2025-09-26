@@ -14,14 +14,19 @@ import {
   parseAllDateFormats,
 } from "../../lib/common";
 import MobileFilter from "@/components/custom/filter/MobileFilter";
-import BookingAction from "./bookingComponents/BookingAction";
-import BookingStatus from "./bookingComponents/BookingStatus";
+import BookingAction from "./bookingComponents/components/BookingAction";
+import BookingStatus from "./bookingComponents/components/BookingStatus";
 import CommonSearchBox from "@/components/custom/search/CommonSearchBox";
 import CustomTable from "@/components/custom/Table/CustomTable/CustomTable";
 import ClearFilterButton from "@/components/custom/button/ClearFilterButton";
 import useVendorLinkableId from "@/hooks/auth/useVendorLinkableId";
 import { useGetBookings } from "@/hooks/useQuerys/bookings/bookingsQuery";
 import { useDebounce } from "@uidotdev/usehooks";
+import ViewBookingDetails from "./bookingComponents/modals/ViewBookingDetails";
+import CustomModalRenderer from "@/components/custom/ModalRenderer/CustomModalRenderer";
+import useCustomModalRenderer from "@/components/custom/ModalRenderer/useCustomModalRenderer";
+import BookingCustomerDetails from "./bookingComponents/components/BookingCustomerDetails";
+import CustomModal from "@/components/custom/modal/CustomModal/CustomModal";
 
 const Booking = () => {
   const navigate = useNavigate();
@@ -32,6 +37,14 @@ const Booking = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const { section } = useParams();
+
+  const {
+    activeTypes,
+    push: pushModal,
+    pop: popModal,
+    data: modalData,
+    setData: setModalData,
+  } = useCustomModalRenderer(["booking_details", "customerDetails"]);
   const [filters, setFilters] = useState<{
     dateRange: { start_date: string; end_date: string } | null;
     searchText: string;
@@ -252,24 +265,34 @@ const Booking = () => {
     });
   };
 
-  //modal logic
+  //modal logic - keeping for backward compatibility with other modals
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalData, setModalData] = useState<any>(null);
+  const [modalData_legacy, setModalData_legacy] = useState<any>(null);
   const [selectedModalAction, setSelectedModalAction] = useState("");
 
-  const instituteAction = useCallback((action: string, data: any = {}) => {
-    const allowedActions = [
-      "reject",
-      "approve",
-      "booking_details",
-      "reschedule",
-    ];
-    if (allowedActions.includes(action)) {
-      setSelectedModalAction(action);
-      setModalData(data);
-      setIsModalOpen(true);
-    }
-  }, []);
+  const instituteAction = useCallback(
+    (action: string, data: any = {}) => {
+      const allowedActions = [
+        "reject",
+        "approve",
+        "booking_details",
+        "reschedule",
+      ];
+      if (allowedActions.includes(action)) {
+        if (action === "booking_details") {
+          // Use CustomModalRenderer for booking details
+          setModalData({ selectedbooking: data });
+          pushModal("booking_details");
+        } else {
+          // Keep existing logic for other actions
+          setSelectedModalAction(action);
+          setModalData_legacy(data);
+          setIsModalOpen(true);
+        }
+      }
+    },
+    [pushModal, setModalData]
+  );
 
   const [showDownloadPopup, setShowDownloadPopup] = useState(false);
 
@@ -427,11 +450,7 @@ const Booking = () => {
                     </div>
                     <div>
                       <hr className="my-1" />
-                      <BookingAction
-                        instituteAction={instituteAction}
-                        time={time}
-                        data={row}
-                      />
+                      <BookingAction data={row} />
                     </div>
                   </div>
                 );
@@ -501,21 +520,22 @@ const Booking = () => {
                       status: options?.map?.((item: any) => item.value),
                     }));
                   }}
+                  allowClear={true}
                   options={[
-                    "booking_scheduled",
-                    "consultation_rescheduled",
-                    "open",
-                    "payment_pending",
-                    "prescription_sent_successfully",
-                    "reports_delivered",
-                    "completed",
-                    "cancelled",
-                  ].map((item) => {
-                    return {
-                      value: item,
-                      label: formatStatus(item),
-                    };
-                  })}
+                    { value: "open", label: "Open" },
+                    { value: "reports_delivered", label: "Reports Delivered" },
+                    { value: "completed", label: "Completed" },
+                    { value: "booking_scheduled", label: "Booking Scheduled" },
+                    {
+                      value: "awaiting_lab_confirmation",
+                      label: "Awaiting Lab Confirmation",
+                    },
+                    { value: "cancelled", label: "Cancelled" },
+                    {
+                      value: "sample_collected",
+                      label: "Sample Collected",
+                    },
+                  ]}
                 />
               </div>
             </div>
@@ -586,7 +606,9 @@ const Booking = () => {
                 render: (value, row) => {
                   return (
                     <span
-                      onClick={() => handleRowClick(row?.user?.id)}
+                      onClick={() =>
+                        pushModal("customerDetails", { selectedCustomer: row })
+                      }
                       className="name !text-blue-600 cursor-pointer"
                     >
                       {getName(value?.first_name, value?.last_name)}
@@ -643,13 +665,7 @@ const Booking = () => {
                 key: "Actions",
                 dataIndex: "actions",
                 render: (_, row) => {
-                  return (
-                    <BookingAction
-                      instituteAction={instituteAction}
-                      time={time}
-                      data={row}
-                    />
-                  );
+                  return <BookingAction data={row} />;
                 },
               },
             ]}
@@ -671,6 +687,38 @@ const Booking = () => {
           />
         </div>
       </div>
+      <CustomModalRenderer
+        modals={[
+          {
+            type: "booking_details",
+            component: (
+              <ViewBookingDetails
+                open={true}
+                handleModalClose={() => popModal("booking_details")}
+                selectedbooking={modalData?.selectedbooking}
+              />
+            ),
+          },
+          {
+            type: "customerDetails",
+            component: (
+              <CustomModal
+                title="Customer Details"
+                open={true}
+                handleClose={() => popModal("customerDetails")}
+              >
+                <CustomModal.Body>
+                  <BookingCustomerDetails
+                    bookingDetails={modalData?.selectedCustomer}
+                  />
+                </CustomModal.Body>
+              </CustomModal>
+            ),
+          },
+        ]}
+        activeTypes={activeTypes}
+        data={modalData}
+      />
     </BookingStyled>
   );
 };

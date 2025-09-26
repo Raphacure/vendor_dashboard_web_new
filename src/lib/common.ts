@@ -622,6 +622,11 @@ export const getCurrentRoute = (
     : null;
 };
 
+export interface commonApiError {
+  message: string;
+  success: boolean;
+}
+
 
 export const parseAllDateFormats = (date = "")=>{
   // Example date params :- 2025-07-30T00:00:00.000Z , 30/07/2025, etc

@@ -19,7 +19,7 @@ if (isServiceWorkerSupported()) {
   console.warn("Service workers are not supported in this browser.");
 }
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
