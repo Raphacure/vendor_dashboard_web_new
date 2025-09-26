@@ -610,64 +610,6 @@ export const BookingStyled = styled.div`
     border: 1px solid #d6cece;
   }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-
-    tr {
-      border-bottom: 1px solid #d6cece;
-    }
-
-    tr:last-child {
-      border-bottom: none;
-    }
-  }
-  th {
-    font-size: 18px;
-    font-weight: 500;
-    color: #000;
-    text-align: center;
-    padding: 10px;
-  }
-
-  th:first-child {
-    border-top-left-radius: 20px;
-  }
-
-  th:last-child {
-    border-top-right-radius: 20px;
-  }
-  td {
-    font-size: 16px;
-    font-weight: 500;
-    color: #000;
-    padding: 10px;
-    text-align: center;
-  }
-
-  thead {
-    background-color: #e9f2fd;
-    font-weight: bold;
-    border: 2px solid white;
-    border-bottom: none;
-  }
-
-  th {
-    font-size: 16px;
-    font-weight: 500;
-    color: #000;
-    text-align: center;
-    padding: 10px;
-  }
-
-  th:first-child {
-    border-top-left-radius: 20px;
-  }
-
-  th:last-child {
-    border-top-right-radius: 20px;
-  }
-
   .name {
     color: #252b61;
     font-size: 16px;
